@@ -1,4 +1,5 @@
-﻿using ChatApp.Models.Auth;
+﻿using ChatApp.Models;
+using ChatApp.Models.Auth;
 using ChatApp.Services.Auth;
 using Microsoft.AspNetCore.Mvc;
 
@@ -25,6 +26,13 @@ public class AuthController : ControllerBase
     [Route("login")]
     public async Task<ActionResult<TokenResponse>> Login([FromBody] LoginRequest request)
     {
-        return await _authService.LoginAsync(request);
+        try
+        {
+            return await _authService.LoginAsync(request);
+        }
+        catch (UnauthorizedAccessException e)
+        {
+            return Unauthorized(new ErrorResponse(e.Message));
+        }
     }
 }

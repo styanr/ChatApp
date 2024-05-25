@@ -29,7 +29,7 @@ public class AuthService : IAuthService
             throw new UnauthorizedAccessException("Invalid email or password");
         }
         
-        return new TokenResponse(_jwtUtil.GenerateJwtToken(user.Email));
+        return new TokenResponse(_jwtUtil.GenerateJwtToken(user));
     }
 
     public async Task<TokenResponse> RegisterAsync(RegisterRequest request)
@@ -47,6 +47,6 @@ public class AuthService : IAuthService
         
         await _userRepository.AddAsync(user);
 
-        return new TokenResponse(_jwtUtil.GenerateJwtToken(user.Email));
+        return new TokenResponse(_jwtUtil.GenerateJwtToken(user));
     }
 }
