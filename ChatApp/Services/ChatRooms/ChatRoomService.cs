@@ -4,6 +4,7 @@ using ChatApp.Exceptions;
 using ChatApp.Mapping;
 using ChatApp.Models.Messages;
 using ChatApp.Repositories.ChatRooms;
+using ChatApp.Repositories.Messages;
 using ChatApp.Repositories.Users;
 
 namespace ChatApp.Services.ChatRooms
@@ -12,6 +13,7 @@ namespace ChatApp.Services.ChatRooms
     {
         private readonly IChatRoomRepository _chatRoomRepository;
         private readonly IUserRepository _userRepository;
+        private readonly IMessageRepository _messageRepository;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
         public ChatRoomService(IChatRoomRepository chatRoomRepository, IUserRepository userRepository, IHttpContextAccessor httpContextAccessor)
@@ -21,31 +23,25 @@ namespace ChatApp.Services.ChatRooms
             _httpContextAccessor = httpContextAccessor;
         }
 
-        public async Task<IEnumerable<ChatRoomSummary>> GetAllAsync()
+        public async Task<IEnumerable<ChatRoomSummary>> GetAllAsync(Guid userId)
         {
-            var userGuid = GetCurrentUserId();
-
-            var directChatRoomsTask = _chatRoomRepository.GetDirectChatRoomsAsync(userGuid);
-            var groupChatRoomsTask = _chatRoomRepository.GetGroupChatRoomsAsync(userGuid);
-
-            await Task.WhenAll(directChatRoomsTask, groupChatRoomsTask);
-
-            var chatRoomSummaries = directChatRoomsTask.Result.Select(dc => dc.ToChatRoomSummary(userGuid))
-                .Concat(groupChatRoomsTask.Result.Select(gc => gc.ToChatRoomSummary()));
-
+            var directChatRoomsTask = await _chatRoomRepository.GetDirectChatRoomsAsync(userId);
+            var groupChatRoomsTask = await _chatRoomRepository.GetGroupChatRoomsAsync(userId);
+            
+            var chatRoomSummaries = directChatRoomsTask.Select(dc => dc.ToChatRoomSummary(userId))
+                .Concat(groupChatRoomsTask.Select(gc => gc.ToChatRoomSummary()));
             return chatRoomSummaries;
         }
 
-        public async Task<ChatRoomSummary> CreateGroupChatAsync(ChatRoomCreate chatRoomCreate)
+        public async Task<ChatRoomSummary> CreateGroupChatAsync(Guid userId, ChatRoomCreate chatRoomCreate)
         {
-            var userGuid = GetCurrentUserId();
-            var user = await _userRepository.GetByIdAsync(userGuid);
+            var user = await _userRepository.GetByIdAsync(userId);
 
             var groupChatRoom = new GroupChatRoom
             {
                 Name = chatRoomCreate.Name ?? throw new ArgumentNullException(nameof(chatRoomCreate.Name)),
                 PictureUrl = chatRoomCreate.PictureUrl,
-                Users = [user]
+                UserList = [user]
             };
 
             await _chatRoomRepository.AddAsync(groupChatRoom);
@@ -53,38 +49,57 @@ namespace ChatApp.Services.ChatRooms
             return groupChatRoom.ToChatRoomSummary();
         }
 
-        public async Task<ChatRoomSummary> AddUsersToChatAsync(Guid chatId, ChatRoomAddUsers chatRoomAddUsers)
+        public async Task<ChatRoomSummary> AddUsersToChatAsync(Guid userId, Guid chatId, ChatRoomAddUsers chatRoomAddUsers)
         {
             var chatRoom = await GetGroupChatRoomWithUserValidationAsync(chatId);
+            var user = chatRoom.UserList.FirstOrDefault(u => u.Id == userId);
+            
+            if (user is null)
+            {
+                throw new UserNotFoundException("User not found in chat room");
+            }
+            
             var users = await ValidateUsersExistenceAsync(chatRoomAddUsers.UserIds);
 
-            chatRoom.Users = chatRoom.Users.Union(users).ToList();
+            chatRoom.UserList = chatRoom.UserList.Union(users).ToList();
 
             await _chatRoomRepository.UpdateAsync(chatRoom);
 
             return chatRoom.ToChatRoomSummary();
         }
 
-        public async Task<ChatRoomSummary> RemoveUserFromChatAsync(Guid chatId, Guid userId)
+        public async Task<ChatRoomSummary> RemoveUserFromChatAsync(Guid userId, Guid chatId, Guid deleteUserId)
         {
             var chatRoom = await GetGroupChatRoomWithUserValidationAsync(chatId);
-            var user = chatRoom.Users.FirstOrDefault(u => u.Id == userId);
+            var user = chatRoom.UserList.FirstOrDefault(u => u.Id == userId);
 
             if (user is null)
             {
                 throw new UserNotFoundException("User not found in chat room");
             }
+            
+            var userToDelete = chatRoom.UserList.FirstOrDefault(u => u.Id == deleteUserId);
+            if (userToDelete is null)
+            {
+                throw new UserNotFoundException("User to delete not found in chat room");
+            }
 
-            chatRoom.Users.Remove(user);
+            chatRoom.UserList.Remove(user);
 
             await _chatRoomRepository.UpdateAsync(chatRoom);
 
             return chatRoom.ToChatRoomSummary();
         }
 
-        public async Task<ChatRoomSummary> UpdateGroupChatAsync(Guid chatId, ChatRoomUpdate chatRoomUpdate)
+        public async Task<ChatRoomSummary> UpdateGroupChatAsync(Guid userId, Guid chatId, ChatRoomUpdate chatRoomUpdate)
         {
             var chatRoom = await GetGroupChatRoomWithUserValidationAsync(chatId);
+            
+            var user = chatRoom.UserList.FirstOrDefault(u => u.Id == userId);
+            if (user is null)
+            {
+                throw new UserNotFoundException("User not found in chat room");
+            }
 
             chatRoom.Name = chatRoomUpdate.Name ?? chatRoom.Name;
             chatRoom.Description = chatRoomUpdate.Description ?? chatRoom.Description;
@@ -94,28 +109,28 @@ namespace ChatApp.Services.ChatRooms
 
             return chatRoom.ToChatRoomSummary();
         }
-
-        private Guid GetCurrentUserId()
+        
+        public async Task<bool> IsUserInChatAsync(Guid userId, Guid chatId)
         {
-            var userId = _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (userId is null)
-            {
-                throw new UserNotFoundException("User not found");
-            }
-
-            return Guid.Parse(userId);
-        }
-
-        private async Task<GroupChatRoom> GetGroupChatRoomWithUserValidationAsync(Guid chatId)
-        {
-            var chatRoom = await _chatRoomRepository.GetGroupChatRoomAsync(chatId);
+            var chatRoom = await _chatRoomRepository.GetByIdAsync(chatId);
             if (chatRoom is null)
             {
                 throw new ChatRoomNotFoundException("Chat room not found");
             }
 
-            var userGuid = GetCurrentUserId();
-            if (chatRoom.Users.All(u => u.Id != userGuid))
+            return chatRoom.Users.Any(u => u.Id == userId);
+        }
+
+        private async Task<GroupChatRoom> GetGroupChatRoomWithUserValidationAsync(Guid chatId)
+        {
+            var chatRoom = await _chatRoomRepository.GetGroupChatRoomAsync(chatId);
+            
+            if (chatRoom is null)
+            {
+                throw new ChatRoomNotFoundException("Chat room not found");
+            }
+            
+            if (chatRoom.UserList.All(u => u.Id != chatId))
             {
                 throw new UserNotFoundException("User not found in chat room");
             }

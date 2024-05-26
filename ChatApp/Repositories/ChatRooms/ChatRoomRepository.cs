@@ -18,15 +18,15 @@ public class ChatRoomRepository(ChatDbContext context) : Repository<ChatRoom>(co
     public async Task<IEnumerable<GroupChatRoom>> GetGroupChatRoomsAsync(Guid userId)
     {
         return await _context.GroupChatRooms
-            .Include(x => x.Users)
-            .Where(x => x.Users.Any(u => u.Id == userId))
+            .Include(x => x.UserList)
+            .Where(x => x.UserList.Any(u => u.Id == userId))
             .ToListAsync();
     }
 
     public Task<GroupChatRoom?> GetGroupChatRoomAsync(Guid chatRoomId)
     {
         return _context.GroupChatRooms
-            .Include(x => x.Users)
+            .Include(x => x.UserList)
             .Include(x => x.Messages)
             .FirstOrDefaultAsync(x => x.Id == chatRoomId);
     }

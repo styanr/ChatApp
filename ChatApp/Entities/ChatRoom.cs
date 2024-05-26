@@ -7,6 +7,9 @@ public abstract class ChatRoom
 {
     public Guid Id { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-    
     public List<Message> Messages { get; set; } = new();
+
+    [NotMapped]
+    public abstract ICollection<User> Users { get; }
+
 }

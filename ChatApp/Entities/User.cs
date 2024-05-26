@@ -23,4 +23,6 @@ public class User
     public string? Bio { get; set; }
     
     public string? ProfilePictureUrl { get; set; }
+    
+    public List<ChatRoom> ChatRooms { get; set; }
 }

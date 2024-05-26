@@ -4,9 +4,11 @@ namespace ChatApp.Services.ChatRooms;
 
 public interface IChatRoomService
 {
-    Task<IEnumerable<ChatRoomSummary>> GetAllAsync();
-    Task<ChatRoomSummary> CreateGroupChatAsync(ChatRoomCreate chatRoomCreate);
-    Task<ChatRoomSummary> AddUsersToChatAsync(Guid chatId, ChatRoomAddUsers chatRoomAddUsers);
-    Task<ChatRoomSummary> RemoveUserFromChatAsync(Guid chatId, Guid userId);
-    Task<ChatRoomSummary> UpdateGroupChatAsync(Guid chatId, ChatRoomUpdate chatRoomUpdate);
+    Task<IEnumerable<ChatRoomSummary>> GetAllAsync(Guid userId);
+    Task<ChatRoomSummary> CreateGroupChatAsync(Guid userId, ChatRoomCreate chatRoomCreate);
+    Task<ChatRoomSummary> AddUsersToChatAsync(Guid userId, Guid chatId, ChatRoomAddUsers chatRoomAddUsers);
+    Task<ChatRoomSummary> RemoveUserFromChatAsync(Guid userId, Guid chatId, Guid deleteUserId);
+    Task<ChatRoomSummary> UpdateGroupChatAsync(Guid userId, Guid chatId, ChatRoomUpdate chatRoomUpdate);
+    
+    Task<bool> IsUserInChatAsync(Guid userId, Guid chatId);
 }

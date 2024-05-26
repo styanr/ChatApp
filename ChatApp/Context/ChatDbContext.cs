@@ -50,7 +50,7 @@ public class ChatDbContext : DbContext
             .OnDelete(DeleteBehavior.Restrict);
         
         modelBuilder.Entity<GroupChatRoom>()
-            .HasMany(x => x.Users)
+            .HasMany(x => x.UserList)
             .WithMany()
             .UsingEntity(x => x.ToTable("GroupChatRoomUsers"));
     }
