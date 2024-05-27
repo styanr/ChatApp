@@ -17,7 +17,7 @@ public class JwtUtil
         _jwtSettings = jwtSettings;
     }
     
-    public TokenResponse GenerateJwtToken(User user)
+    public (string accessToken, string refreshToken, DateTime refreshTokenExpiry) GenerateTokens(User user)
     {
         var tokenHandler = new JwtSecurityTokenHandler();
         var key = Encoding.ASCII.GetBytes(_jwtSettings.Key);
@@ -35,12 +35,7 @@ public class JwtUtil
         
         var refreshToken = GenerateRefreshToken();
         
-        return new TokenResponse
-        (
-            tokenHandler.WriteToken(token),
-            refreshToken,
-            DateTime.UtcNow.AddDays(_jwtSettings.RefreshTokenDurationInDays)
-        );
+        return (tokenHandler.WriteToken(token), refreshToken, DateTime.UtcNow.AddDays(_jwtSettings.RefreshTokenDurationInDays));
     }
 
     private string GenerateRefreshToken()

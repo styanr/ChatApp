@@ -111,10 +111,10 @@ builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policyBuilder =>
     {
-        policyBuilder
-            .AllowAnyHeader()
+        policyBuilder.AllowAnyHeader()
             .AllowAnyMethod()
-            .AllowAnyOrigin();
+            .SetIsOriginAllowed(_ => true)
+            .AllowCredentials();
     });
 });
 

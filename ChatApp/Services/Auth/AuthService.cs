@@ -1,7 +1,6 @@
 ﻿using System.Security.Claims;
 using ChatApp.Entities;
 using ChatApp.Models.Auth;
-using ChatApp.Repositories;
 using ChatApp.Repositories.Users;
 
 namespace ChatApp.Services.Auth;
@@ -11,32 +10,32 @@ public class AuthService : IAuthService
     private readonly JwtUtil _jwtUtil;
     private readonly IUserRepository _userRepository;
     private readonly IPasswordHasher _passwordHasher;
+    private readonly IHttpContextAccessor _httpContextAccessor;
 
-    public AuthService(JwtUtil jwtUtil, IUserRepository userRepository, IPasswordHasher passwordHasher)
+    public AuthService(JwtUtil jwtUtil, IUserRepository userRepository, IPasswordHasher passwordHasher, IHttpContextAccessor httpContextAccessor)
     {
         _jwtUtil = jwtUtil;
         _userRepository = userRepository;
         _passwordHasher = passwordHasher;
+        _httpContextAccessor = httpContextAccessor;
     }
-    
+
     public async Task<TokenResponse> LoginAsync(LoginRequest request)
     {
-        var user = await _userRepository.GetByEmailAsync(request.Email);
-        
-        var result = user is not null && _passwordHasher.VerifyPassword(user.PasswordHash, request.Password);
-        
-        if (!result)
+        var user = await _userRepository.GetByEmailAsync(request.Email)
+                   ?? throw new UnauthorizedAccessException("Invalid email or password");
+
+        if (!_passwordHasher.VerifyPassword(user.PasswordHash, request.Password))
         {
             throw new UnauthorizedAccessException("Invalid email or password");
         }
-        
-        return await GenerateJwtToken(user);
+
+        return await GenerateJwtTokenAsync(user);
     }
 
     public async Task<TokenResponse> RegisterAsync(RegisterRequest request)
     {
         var passwordHash = _passwordHasher.HashPassword(request.Password);
-        
         var user = new User
         {
             Email = request.Email,
@@ -45,45 +44,55 @@ public class AuthService : IAuthService
             ProfilePictureUrl = request.ProfilePictureUrl,
             PasswordHash = passwordHash
         };
-        
-        await _userRepository.AddAsync(user);
 
-        return await GenerateJwtToken(user);
+        await _userRepository.AddAsync(user);
+        return await GenerateJwtTokenAsync(user);
     }
 
     public async Task<TokenResponse> RefreshTokenAsync(TokenRequest request)
     {
+        var refreshToken = _httpContextAccessor.HttpContext?.Request.Cookies["refreshToken"]
+                           ?? throw new UnauthorizedAccessException("Invalid token");
+
         var principal = _jwtUtil.GetPrincipalFromToken(request.AccessToken);
-        
-        var userId = principal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        
-        if (userId is null)
+        var userId = principal.FindFirst(ClaimTypes.NameIdentifier)?.Value
+                      ?? throw new UnauthorizedAccessException("Invalid token");
+
+        var user = await _userRepository.GetByIdAsync(Guid.Parse(userId))
+                   ?? throw new UnauthorizedAccessException("Invalid token");
+
+        if (user.RefreshToken != refreshToken || user.RefreshTokenExpiry < DateTime.UtcNow)
         {
             throw new UnauthorizedAccessException("Invalid token");
         }
-        
-        var user = await _userRepository.GetByIdAsync(Guid.Parse(userId));
-        
-        if (user is null || user.RefreshToken != request.RefreshToken || user.RefreshTokenExpiry < DateTime.UtcNow)
-        {
-            throw new UnauthorizedAccessException("Invalid token");
-        }
-        
-        return await GenerateJwtToken(user, false);
+
+        return await GenerateJwtTokenAsync(user, false);
     }
 
-    private async Task<TokenResponse> GenerateJwtToken(User user, bool setRefreshTokenExpiry = true)
+    private async Task<TokenResponse> GenerateJwtTokenAsync(User user, bool setRefreshTokenExpiry = true)
     {
-        var token = _jwtUtil.GenerateJwtToken(user);
+        var tokens = _jwtUtil.GenerateTokens(user);
 
-        user.RefreshToken = token.RefreshToken;
+        user.RefreshToken = tokens.refreshToken;
         if (setRefreshTokenExpiry)
         {
-            user.RefreshTokenExpiry = token.RefreshTokenExpiry;
+            user.RefreshTokenExpiry = tokens.refreshTokenExpiry;
         }
 
         await _userRepository.UpdateAsync(user);
-        
-        return token;
+        SetRefreshTokenCookie(tokens.refreshToken, tokens.refreshTokenExpiry);
+
+        return new TokenResponse(tokens.accessToken);
+    }
+
+    private void SetRefreshTokenCookie(string refreshToken, DateTime expiry)
+    {
+        var cookieOptions = new CookieOptions
+        {
+            HttpOnly = true,
+            Expires = expiry
+        };
+
+        _httpContextAccessor.HttpContext?.Response.Cookies.Append("refreshToken", refreshToken, cookieOptions);
     }
 }
