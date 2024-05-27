@@ -17,8 +17,10 @@ public class TokenController : ControllerBase
     }
     [HttpPost]
     [Route("refresh")]
-    public async Task<ActionResult<TokenResponse>> Refresh([FromBody] TokenRequest request)
+    public async Task<ActionResult<TokenResponse>> Refresh()
     {
+        var token = Request.Headers["Authorization"].ToString().Split(" ")[1];
+        var request = new TokenRequest(token);
         try
         {
             return await _authService.RefreshTokenAsync(request);
