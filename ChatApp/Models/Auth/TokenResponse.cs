@@ -1,3 +1,3 @@
 ﻿namespace ChatApp.Models.Auth;
 
-public record TokenResponse(string Token);
+public record TokenResponse(string AccessToken, string RefreshToken, DateTime RefreshTokenExpiry);

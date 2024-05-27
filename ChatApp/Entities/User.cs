@@ -24,5 +24,9 @@ public class User
     
     public string? ProfilePictureUrl { get; set; }
     
+    public string? RefreshToken { get; set; }
+    
+    public DateTime? RefreshTokenExpiry { get; set; }
+    
     public List<ChatRoom> ChatRooms { get; set; }
 }
