@@ -1,6 +1,6 @@
 import {
-    BaseQueryApi,
-    BaseQueryFn,
+  BaseQueryApi,
+  BaseQueryFn,
   createApi,
   FetchArgs,
   fetchBaseQuery,
@@ -13,6 +13,7 @@ const baseQuery = fetchBaseQuery({
   baseUrl: "http://localhost:5117/api",
   credentials: "include",
   prepareHeaders: (headers, { getState }) => {
+    headers.set("content-type", "application/json")
     const token = (getState() as RootState).auth.token
     if (token) {
       headers.set("authorization", `Bearer ${token}`)
@@ -21,12 +22,11 @@ const baseQuery = fetchBaseQuery({
   },
 })
 
-
 const baseQueryWithReauth = async (
-    args: string | FetchArgs,
-    api: BaseQueryApi,
-    extraOptions: {},
-    ) => {
+  args: string | FetchArgs,
+  api: BaseQueryApi,
+  extraOptions: {},
+) => {
   let result = await baseQuery(args, api, extraOptions)
 
   if (result?.error && (result.error as FetchBaseQueryError).status === 401) {
@@ -59,8 +59,8 @@ const baseQueryWithReauth = async (
   return result
 }
 
-
 export const apiSlice = createApi({
-    baseQuery: baseQueryWithReauth,
-    endpoints: (builder) => ({}),
+  baseQuery: baseQueryWithReauth,
+  endpoints: builder => ({}),
+  tagTypes: ["User", "Contact"],
 })

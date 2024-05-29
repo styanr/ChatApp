@@ -1,13 +1,15 @@
 using System.Text;
 using ChatApp.Context;
 using ChatApp.Hubs;
-using ChatApp.Repositories;
 using ChatApp.Repositories.ChatRooms;
+using ChatApp.Repositories.Contacts;
 using ChatApp.Repositories.Messages;
 using ChatApp.Repositories.Users;
 using ChatApp.Services.Auth;
 using ChatApp.Services.ChatRooms;
+using ChatApp.Services.Contacts;
 using ChatApp.Services.Messages;
+using ChatApp.Services.Users;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -36,6 +38,7 @@ builder.Services.AddSingleton(jwtSettings);
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IMessageRepository, MessageRepository>();
 builder.Services.AddScoped<IChatRoomRepository, ChatRoomRepository>();
+builder.Services.AddScoped<IContactRepository, ContactRepository>();
 
 builder.Services.AddTransient<IPasswordHasher, PasswordHasher>();
 builder.Services.AddTransient<JwtUtil>();
@@ -43,6 +46,8 @@ builder.Services.AddTransient<JwtUtil>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IChatRoomService, ChatRoomService>();
 builder.Services.AddScoped<IMessageService, MessageService>();
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IContactService, ContactService>();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(x =>
 {
@@ -69,7 +74,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
         ValidateIssuer = true,
         ValidateAudience = true,
         ValidateLifetime = true,
-        ValidateIssuerSigningKey = true
+        ValidateIssuerSigningKey = true,
+        ClockSkew = TimeSpan.Zero
     };
 });
 

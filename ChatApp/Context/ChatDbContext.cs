@@ -14,6 +14,7 @@ public class ChatDbContext : DbContext
     public DbSet<ChatRoom> ChatRooms { get; set; }
     public DbSet<DirectChatRoom> DirectChatRooms { get; set; }
     public DbSet<GroupChatRoom> GroupChatRooms { get; set; }
+    public DbSet<Contact> Contacts { get; set; }
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -22,6 +23,9 @@ public class ChatDbContext : DbContext
         
         modelBuilder.Entity<User>()
             .Property(x => x.Id).HasDefaultValueSql("NEWID()");
+        
+        modelBuilder.Entity<User>()
+            .HasIndex(x => x.Email).IsUnique();
         
         modelBuilder.Entity<ChatRoom>()
             .HasKey(x => x.Id);
@@ -53,5 +57,21 @@ public class ChatDbContext : DbContext
             .HasMany(x => x.UserList)
             .WithMany()
             .UsingEntity(x => x.ToTable("GroupChatRoomUsers"));
+
+        modelBuilder.Entity<Contact>()
+            .HasOne(x => x.User)
+            .WithMany(x => x.Contacts)
+            .HasForeignKey(x => x.UserId)
+            .OnDelete(DeleteBehavior.Restrict);
+        
+        modelBuilder.Entity<Contact>()
+            .HasOne(x => x.ContactUser)
+            .WithMany()
+            .HasForeignKey(x => x.ContactId)
+            .OnDelete(DeleteBehavior.Restrict);
+        
+        modelBuilder.Entity<Contact>()
+            .HasKey(x => new { x.UserId, x.ContactId });
+        
     }
 }

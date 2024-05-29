@@ -18,7 +18,7 @@ public class User
     [Required]
     public string PasswordHash { get; set; }
     
-    public string? DisplayName { get; set; }
+    public string DisplayName { get; set; }
     
     public string? Bio { get; set; }
     
@@ -29,4 +29,6 @@ public class User
     public DateTime? RefreshTokenExpiry { get; set; }
     
     public List<ChatRoom> ChatRooms { get; set; }
+    
+    public List<Contact> Contacts { get; set; }
 }

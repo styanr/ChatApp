@@ -12,17 +12,26 @@ import { TypedUseSelectorHook, useSelector } from "react-redux"
 import storage from "redux-persist/lib/storage"
 import { persistReducer } from "redux-persist"
 
-const reducers = combineReducers({
+const combinedReducer = combineReducers({
   [apiSlice.reducerPath]: apiSlice.reducer,
   auth: authReducer,
 })
+
+const rootReducer = (state: any, action: any) => {
+  console.log("rootReducer", action)
+  if (action.type === "auth/logOut") {
+    console.log("logOut")
+    return combinedReducer(undefined, action)
+  }
+  return combinedReducer(state, action)
+}
 
 const persistConfig = {
   key: "root",
   storage,
 }
 
-const persistedReducer = persistReducer(persistConfig, reducers)
+const persistedReducer = persistReducer(persistConfig, rootReducer)
 
 export const store = configureStore({
   reducer: persistedReducer,

@@ -5,6 +5,15 @@ namespace ChatApp.Mapping;
 
 public static class ChatRoomExtensions
 {
+    public static ChatRoomSummary ToChatRoomSummary(this ChatRoom chatRoom)
+    {
+        return chatRoom switch
+        {
+            DirectChatRoom dc => dc.ToChatRoomSummary(),
+            GroupChatRoom gc => gc.ToChatRoomSummary(),
+            _ => throw new ArgumentException("Invalid chat room type")
+        };
+    }
     public static ChatRoomSummary ToChatRoomSummary(this DirectChatRoom chatRoom, Guid userId)
     {
         var otherUser = chatRoom.User1Id == userId ? chatRoom.User2 : chatRoom.User1;

@@ -51,6 +51,25 @@ namespace ChatApp.Migrations
                     b.UseTphMappingStrategy();
                 });
 
+            modelBuilder.Entity("ChatApp.Entities.Contact", b =>
+                {
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("ContactId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("CustomName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("UserId", "ContactId");
+
+                    b.HasIndex("ContactId");
+
+                    b.ToTable("Contacts");
+                });
+
             modelBuilder.Entity("ChatApp.Entities.Message", b =>
                 {
                     b.Property<Guid>("Id")
@@ -96,11 +115,12 @@ namespace ChatApp.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("DisplayName")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Email")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Handle")
                         .HasColumnType("nvarchar(max)");
@@ -119,6 +139,9 @@ namespace ChatApp.Migrations
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Email")
+                        .IsUnique();
 
                     b.ToTable("Users");
                 });
@@ -179,6 +202,25 @@ namespace ChatApp.Migrations
                     b.HasOne("ChatApp.Entities.User", null)
                         .WithMany("ChatRooms")
                         .HasForeignKey("UserId");
+                });
+
+            modelBuilder.Entity("ChatApp.Entities.Contact", b =>
+                {
+                    b.HasOne("ChatApp.Entities.User", "ContactUser")
+                        .WithMany()
+                        .HasForeignKey("ContactId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("ChatApp.Entities.User", "User")
+                        .WithMany("Contacts")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("ContactUser");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("ChatApp.Entities.Message", b =>
@@ -242,6 +284,8 @@ namespace ChatApp.Migrations
             modelBuilder.Entity("ChatApp.Entities.User", b =>
                 {
                     b.Navigation("ChatRooms");
+
+                    b.Navigation("Contacts");
                 });
 #pragma warning restore 612, 618
         }

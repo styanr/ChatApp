@@ -6,6 +6,9 @@ import RequireAuth from "./components/RequireAuth"
 import { useAppSelector } from "./app/store"
 import Layout from "./components/Layout"
 import Public from "./components/Public"
+import MePage from "./pages/MePage"
+import ContactsPage from "./pages/ContactsPage"
+import ContactPage from "./pages/ContactPage"
 
 const App = () => {
   return (
@@ -18,8 +21,10 @@ const App = () => {
         {/* protected routes */}
         <Route element={<RequireAuth />}>
           <Route path="welcome" element={<Welcome />} />
+          <Route path="me" element={<MePage />} />
+          <Route path="contacts" element={<ContactsPage />} />
+          <Route path="contacts/:id" element={<ContactPage />} />
         </Route>
-        
       </Route>
     </Routes>
   )

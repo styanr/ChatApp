@@ -19,6 +19,13 @@ public class TokenController : ControllerBase
     [Route("refresh")]
     public async Task<ActionResult<TokenResponse>> Refresh()
     {
+        var header = Request.Headers["Authorization"]; 
+        
+        if (header.Count == 0)
+        {
+            return Unauthorized(new ErrorResponse("No token provided"));
+        }
+        
         var token = Request.Headers["Authorization"].ToString().Split(" ")[1];
         var request = new TokenRequest(token);
         try

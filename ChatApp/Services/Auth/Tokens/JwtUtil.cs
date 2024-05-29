@@ -59,8 +59,7 @@ public class JwtUtil
             ValidIssuer = _jwtSettings.Issuer,
             ValidateAudience = true,
             ValidAudience = _jwtSettings.Audience,
-            ValidateLifetime = true,
-            ClockSkew = TimeSpan.Zero
+            ValidateLifetime = false
         };
         
         SecurityToken securityToken;

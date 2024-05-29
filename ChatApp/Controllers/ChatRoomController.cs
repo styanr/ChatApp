@@ -38,14 +38,48 @@ public class ChatRoomController : ControllerBase
             return Unauthorized(new ErrorResponse(e.Message));
         }
     }
-
-    [HttpPost("group")]
-    public async Task<ActionResult<ChatRoomSummary>> CreateGroupChat([FromBody] ChatRoomCreate chatRoomCreate)
+    
+    [HttpGet("{chatId}")]
+    public async Task<ActionResult<ChatRoomSummary>> GetChat(Guid chatId)
     {
         try
         {
             var userId = GetUserId();
-            var chatRoomSummary = await _chatRoomService.CreateGroupChatAsync(userId, chatRoomCreate);
+            var chatRoomSummary = await _chatRoomService.GetChatAsync(userId, chatId);
+            return Ok(chatRoomSummary);
+        }
+        catch (ChatRoomNotFoundException e)
+        {
+            return NotFound(new ErrorResponse(e.Message));
+        }
+        catch (UserNotFoundException e)
+        {
+            return NotFound(new ErrorResponse(e.Message));
+        }
+    }
+    
+    [HttpPost("direct")]
+    public async Task<ActionResult<ChatRoomSummary>> CreateDirectChat([FromBody] DirectChatRoomCreate groupChatRoomCreate)
+    {
+        try
+        {
+            var userId = GetUserId();
+            var chatRoomSummary = await _chatRoomService.CreateDirectChatAsync(userId, groupChatRoomCreate.OtherUserId);
+            return CreatedAtAction(nameof(GetAll), new { id = chatRoomSummary.Id }, chatRoomSummary);
+        }
+        catch (UserNotFoundException e)
+        {
+            return Unauthorized(new ErrorResponse(e.Message));
+        }
+    }
+
+    [HttpPost("group")]
+    public async Task<ActionResult<ChatRoomSummary>> CreateGroupChat([FromBody] GroupChatRoomCreate groupChatRoomCreate)
+    {
+        try
+        {
+            var userId = GetUserId();
+            var chatRoomSummary = await _chatRoomService.CreateGroupChatAsync(userId, groupChatRoomCreate);
             return CreatedAtAction(nameof(GetAll), new { id = chatRoomSummary.Id }, chatRoomSummary);
         }
         catch (UserNotFoundException e)

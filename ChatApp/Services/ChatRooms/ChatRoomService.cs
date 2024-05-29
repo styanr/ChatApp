@@ -13,14 +13,11 @@ namespace ChatApp.Services.ChatRooms
     {
         private readonly IChatRoomRepository _chatRoomRepository;
         private readonly IUserRepository _userRepository;
-        private readonly IMessageRepository _messageRepository;
-        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public ChatRoomService(IChatRoomRepository chatRoomRepository, IUserRepository userRepository, IHttpContextAccessor httpContextAccessor)
+        public ChatRoomService(IChatRoomRepository chatRoomRepository, IUserRepository userRepository)
         {
             _chatRoomRepository = chatRoomRepository;
             _userRepository = userRepository;
-            _httpContextAccessor = httpContextAccessor;
         }
 
         public async Task<IEnumerable<ChatRoomSummary>> GetAllAsync(Guid userId)
@@ -33,14 +30,51 @@ namespace ChatApp.Services.ChatRooms
             return chatRoomSummaries;
         }
 
-        public async Task<ChatRoomSummary> CreateGroupChatAsync(Guid userId, ChatRoomCreate chatRoomCreate)
+        public async Task<ChatRoomSummary> GetChatAsync(Guid userId, Guid chatId)
+        {
+            var chatRoom = await _chatRoomRepository.GetByIdAsync(chatId);
+            if (chatRoom is null)
+            {
+                throw new ChatRoomNotFoundException("Chat room not found");
+            }
+
+            if (chatRoom.Users.All(u => u.Id != userId))
+            {
+                throw new UserNotFoundException("User not found in chat room");
+            }
+
+            return chatRoom.ToChatRoomSummary();
+        }
+
+        public async Task<ChatRoomSummary> CreateDirectChatAsync(Guid userId, Guid otherUserId)
+        {
+            var user = await _userRepository.GetByIdAsync(userId);
+            var otherUser = await _userRepository.GetByIdAsync(otherUserId);
+            
+            if (user is null || otherUser is null)
+            {
+                throw new UserNotFoundException("User not found");
+            }
+
+            var directChatRoom = new DirectChatRoom
+            {
+                User1 = user,
+                User2 = otherUser
+            };
+
+            await _chatRoomRepository.AddAsync(directChatRoom);
+
+            return directChatRoom.ToChatRoomSummary(userId);
+        }
+
+        public async Task<ChatRoomSummary> CreateGroupChatAsync(Guid userId, GroupChatRoomCreate groupChatRoomCreate)
         {
             var user = await _userRepository.GetByIdAsync(userId);
 
             var groupChatRoom = new GroupChatRoom
             {
-                Name = chatRoomCreate.Name ?? throw new ArgumentNullException(nameof(chatRoomCreate.Name)),
-                PictureUrl = chatRoomCreate.PictureUrl,
+                Name = groupChatRoomCreate.Name ?? throw new ArgumentNullException(nameof(groupChatRoomCreate.Name)),
+                PictureUrl = groupChatRoomCreate.PictureUrl,
                 UserList = [user]
             };
 

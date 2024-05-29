@@ -1,13 +1,15 @@
 ﻿using System.Linq.Expressions;
+using ChatApp.Models.PagedResult;
 
 namespace ChatApp.Repositories;
 
 public interface IRepository<T> where T : class
 {
     Task AddAsync(T entity);
-    Task<T?> GetByIdAsync(Guid id);
-    Task<List<T>?> GetAllAsync(Expression<Func<T, bool>> predicate);
+    Task<T?> GetByIdAsync(params object[] keyValues);
+    Task<PagedResult<T>> GetAllAsync(int page, int pageSize, Expression<Func<T, bool>>? predicate = null);
+    
     Task UpdateAsync(T entity);
-    Task DeleteByIdAsync(Guid id);
+    Task DeleteByIdAsync(params object[] keyValues);
     Task SaveAsync();
 }

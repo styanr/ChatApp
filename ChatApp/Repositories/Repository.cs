@@ -1,5 +1,6 @@
 ﻿using System.Linq.Expressions;
 using ChatApp.Context;
+using ChatApp.Models.PagedResult;
 using Microsoft.EntityFrameworkCore;
 
 namespace ChatApp.Repositories;
@@ -20,18 +21,23 @@ public class Repository<T> : IRepository<T> where T : class
         await SaveAsync();
     }
 
-    public async Task<T?> GetByIdAsync(Guid id)
+    public async Task<T?> GetByIdAsync(params object[] keyValues)
     {
-        var entity = await _context.FindAsync<T>(id);
+        var entity = await _context.FindAsync<T>(keyValues);
         
         return entity;
     }
-
-    public async Task<List<T>?> GetAllAsync(Expression<Func<T, bool>> predicate)
+    
+    public async Task<PagedResult<T>> GetAllAsync(int page, int pageSize, Expression<Func<T, bool>>? predicate = null)
     {
-        var entities = await _context.Set<T>().Where(predicate).ToListAsync();
+        var entities = predicate == null
+            ? _context.Set<T>()
+            : _context.Set<T>().Where(predicate);
         
-        return entities;
+        var pagedResult = await entities.GetPagedAsync(page, pageSize);
+        
+        
+        return pagedResult;
     }
 
     public async Task UpdateAsync(T entity)
@@ -41,9 +47,9 @@ public class Repository<T> : IRepository<T> where T : class
         await SaveAsync();
     }
 
-    public async Task DeleteByIdAsync(Guid id)
+    public async Task DeleteByIdAsync(params object[] keyValues)
     {
-        var entity = await GetByIdAsync(id);
+        var entity = await GetByIdAsync(keyValues);
         
         if (entity != null)
         {

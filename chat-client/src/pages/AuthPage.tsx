@@ -47,11 +47,12 @@ const AuthPage: FC<AuthPageProps> = ({}) => {
 
       navigate("/welcome")
     } catch (err: any) {
-      if (!err?.originalStatus) {
+      console.log(err)
+      if (!err?.status) {
         setErrMsg("Network error")
-      } else if (err.response?.status === 401) {
+      } else if (err?.status === 401) {
         setErrMsg("Invalid credentials")
-      } else if (err.response?.status === 400) {
+      } else if (err?.status === 400) {
         setErrMsg("Invalid request")
       } else {
         setErrMsg("Unknown error")
@@ -69,13 +70,13 @@ const AuthPage: FC<AuthPageProps> = ({}) => {
     setPassword(e.target.value)
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-black via-gray-900 to-black p-10">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-black via-gray-900 to-black p-5">
       {isLoading ? (
         <div className="flex items-center justify-center">
           <div className="w-16 h-16 border-4 border-solid rounded-full"></div>
         </div>
       ) : (
-        <div className=" px-10 rounded-3xl shadow-2xl overflow-hidden relative transform bg-slate-800">
+        <div className="px-5 rounded-3xl shadow-2xl overflow-hidden relative transform bg-slate-800">
           <div className="absolute inset-0 opacity-25 blur-3xl">
             <div className="h-full"></div>
           </div>
