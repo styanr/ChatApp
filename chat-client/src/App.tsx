@@ -9,6 +9,7 @@ import Public from "./components/Public"
 import MePage from "./pages/MePage"
 import ContactsPage from "./pages/ContactsPage"
 import ContactPage from "./pages/ContactPage"
+import MessagesPage from "./pages/MessagesPage"
 
 const App = () => {
   return (
@@ -24,6 +25,7 @@ const App = () => {
           <Route path="me" element={<MePage />} />
           <Route path="contacts" element={<ContactsPage />} />
           <Route path="contacts/:id" element={<ContactPage />} />
+          <Route path="messages" element={<MessagesPage />} />
         </Route>
       </Route>
     </Routes>

@@ -1,6 +1,7 @@
 using System.Text;
 using ChatApp.Context;
 using ChatApp.Hubs;
+using ChatApp.Managers;
 using ChatApp.Repositories.ChatRooms;
 using ChatApp.Repositories.Contacts;
 using ChatApp.Repositories.Messages;
@@ -43,6 +44,7 @@ builder.Services.AddScoped<IContactRepository, ContactRepository>();
 builder.Services.AddTransient<IPasswordHasher, PasswordHasher>();
 builder.Services.AddTransient<JwtUtil>();
 
+builder.Services.AddScoped<IUserManager, UserManager>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IChatRoomService, ChatRoomService>();
 builder.Services.AddScoped<IMessageService, MessageService>();

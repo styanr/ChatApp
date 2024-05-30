@@ -14,11 +14,13 @@ const ProfileImage: FC<ProfileImageProps> = ({ src, size }) => {
   }
 
   return (
-    <div>
+    <div
+      className={`relative w-full aspect-square max-w-${size} max-h-${size}`}
+    >
       <img
         src={src ? src : imageFallback}
         alt="profile picture"
-        className={`w-${size} h-${size} rounded-full`}
+        className="w-full h-full rounded-full object-cover"
         onError={handleError}
       />
     </div>

@@ -10,7 +10,9 @@ public class ChatRoomRepository(ChatDbContext context) : Repository<ChatRoom>(co
     {
         return await _context.DirectChatRooms
             .Include(x => x.User1)
+                .ThenInclude(u => u.Contacts)
             .Include(x => x.User2)
+                .ThenInclude(u => u.Contacts)
             .Where(x => x.User1Id == userId || x.User2Id == userId)
             .ToListAsync();
     }
@@ -27,7 +29,14 @@ public class ChatRoomRepository(ChatDbContext context) : Repository<ChatRoom>(co
     {
         return _context.GroupChatRooms
             .Include(x => x.UserList)
+                .ThenInclude(x => x.Contacts)
             .Include(x => x.Messages)
             .FirstOrDefaultAsync(x => x.Id == chatRoomId);
+    }
+
+    public Task<bool> DirectChatRoomExists(Guid userId, Guid otherUserId)
+    {
+        return _context.DirectChatRooms
+            .AnyAsync(x => (x.User1Id == userId && x.User2Id == otherUserId) || (x.User1Id == otherUserId && x.User2Id == userId));
     }
 }

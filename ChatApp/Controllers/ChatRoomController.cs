@@ -12,7 +12,7 @@ using ChatApp.Services.ChatRooms;
 
 namespace ChatApp.Controllers;
 
-[Route("api/[controller]")]
+[Route("api/chatrooms")]
 [ApiController]
 [Authorize]
 public class ChatRoomController : ControllerBase
@@ -71,6 +71,10 @@ public class ChatRoomController : ControllerBase
         {
             return Unauthorized(new ErrorResponse(e.Message));
         }
+        catch (ArgumentException e)
+        {
+            return BadRequest(new ErrorResponse(e.Message));
+        }
     }
 
     [HttpPost("group")]
@@ -104,6 +108,10 @@ public class ChatRoomController : ControllerBase
         catch (UserNotFoundException ex)
         {
             return NotFound(ex.Message);
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(ex.Message);
         }
     }
 

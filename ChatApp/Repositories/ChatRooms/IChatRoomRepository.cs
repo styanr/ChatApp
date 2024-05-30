@@ -8,4 +8,5 @@ public interface IChatRoomRepository : IRepository<ChatRoom>
     Task<IEnumerable<GroupChatRoom>> GetGroupChatRoomsAsync(Guid userId);
 
     Task<GroupChatRoom?> GetGroupChatRoomAsync(Guid chatRoomId);
+    Task<bool> DirectChatRoomExists(Guid userId, Guid otherUserId);
 }

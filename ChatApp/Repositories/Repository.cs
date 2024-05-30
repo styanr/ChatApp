@@ -40,6 +40,11 @@ public class Repository<T> : IRepository<T> where T : class
         return pagedResult;
     }
 
+    public async Task<bool> ExistsAsync(params object[] keyValues)
+    {
+        return await _context.FindAsync<T>(keyValues) != null;
+    }
+
     public async Task UpdateAsync(T entity)
     {
         _context.Update(entity);
