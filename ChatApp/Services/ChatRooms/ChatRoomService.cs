@@ -3,6 +3,7 @@ using ChatApp.Entities;
 using ChatApp.Exceptions;
 using ChatApp.Managers;
 using ChatApp.Mapping;
+using ChatApp.Models.ChatRooms;
 using ChatApp.Models.Messages;
 using ChatApp.Repositories.ChatRooms;
 using ChatApp.Repositories.Contacts;
@@ -36,9 +37,9 @@ namespace ChatApp.Services.ChatRooms
             return chatRoomSummaries;
         }
 
-        public async Task<ChatRoomSummary> GetChatAsync(Guid userId, Guid chatId)
+        public async Task<ChatRoomDetails> GetChatAsync(Guid userId, Guid chatId)
         {
-            var chatRoom = await _chatRoomRepository.GetByIdAsync(chatId);
+            var chatRoom = await _chatRoomRepository.GetChatRoomAsync(chatId);
             if (chatRoom is null)
             {
                 throw new ChatRoomNotFoundException("Chat room not found");
@@ -49,10 +50,10 @@ namespace ChatApp.Services.ChatRooms
                 throw new UserNotFoundException("User not found in chat room");
             }
 
-            return chatRoom.ToChatRoomSummary();
+            return chatRoom.ToChatRoomDetails(userId);
         }
 
-        public async Task<ChatRoomSummary> CreateDirectChatAsync(Guid userId, Guid otherUserId)
+        public async Task<ChatRoomDetails> CreateDirectChatAsync(Guid userId, Guid otherUserId)
         {
             var user = await _userRepository.GetByIdAsync(userId);
             var otherUser = await _userRepository.GetByIdAsync(otherUserId);
@@ -85,10 +86,10 @@ namespace ChatApp.Services.ChatRooms
 
             await _chatRoomRepository.AddAsync(directChatRoom);
 
-            return directChatRoom.ToChatRoomSummary(userId);
+            return directChatRoom.ToChatRoomDetails(userId);
         }
 
-        public async Task<ChatRoomSummary> CreateGroupChatAsync(Guid userId, GroupChatRoomCreate groupChatRoomCreate)
+        public async Task<ChatRoomDetails> CreateGroupChatAsync(Guid userId, GroupChatRoomCreate groupChatRoomCreate)
         {
             var user = await _userRepository.GetByIdAsync(userId);
 
@@ -101,10 +102,10 @@ namespace ChatApp.Services.ChatRooms
 
             await _chatRoomRepository.AddAsync(groupChatRoom);
 
-            return groupChatRoom.ToChatRoomSummary();
+            return groupChatRoom.ToChatRoomDetails();
         }
 
-        public async Task<ChatRoomSummary> AddUsersToChatAsync(Guid userId, Guid chatId,
+        public async Task<ChatRoomDetails> AddUsersToChatAsync(Guid userId, Guid chatId,
             ChatRoomAddUsers chatRoomAddUsers)
         {
             var chatRoom = await GetGroupChatRoomWithUserValidationAsync(chatId);
@@ -136,10 +137,10 @@ namespace ChatApp.Services.ChatRooms
 
             await _chatRoomRepository.UpdateAsync(chatRoom);
 
-            return chatRoom.ToChatRoomSummary();
+            return chatRoom.ToChatRoomDetails();
         }
 
-        public async Task<ChatRoomSummary> RemoveUserFromChatAsync(Guid userId, Guid chatId, Guid deleteUserId)
+        public async Task<ChatRoomDetails> RemoveUserFromChatAsync(Guid userId, Guid chatId, Guid deleteUserId)
         {
             var chatRoom = await GetGroupChatRoomWithUserValidationAsync(chatId);
             var user = chatRoom.UserList.FirstOrDefault(u => u.Id == userId);
@@ -159,10 +160,10 @@ namespace ChatApp.Services.ChatRooms
 
             await _chatRoomRepository.UpdateAsync(chatRoom);
 
-            return chatRoom.ToChatRoomSummary();
+            return chatRoom.ToChatRoomDetails();
         }
 
-        public async Task<ChatRoomSummary> UpdateGroupChatAsync(Guid userId, Guid chatId, ChatRoomUpdate chatRoomUpdate)
+        public async Task<ChatRoomDetails> UpdateGroupChatAsync(Guid userId, Guid chatId, ChatRoomUpdate chatRoomUpdate)
         {
             var chatRoom = await GetGroupChatRoomWithUserValidationAsync(chatId);
 
@@ -178,7 +179,7 @@ namespace ChatApp.Services.ChatRooms
 
             await _chatRoomRepository.UpdateAsync(chatRoom);
 
-            return chatRoom.ToChatRoomSummary();
+            return chatRoom.ToChatRoomDetails();
         }
 
         public async Task<bool> IsUserInChatAsync(Guid userId, Guid chatId)

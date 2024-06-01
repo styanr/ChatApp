@@ -18,7 +18,6 @@ const combinedReducer = combineReducers({
 })
 
 const rootReducer = (state: any, action: any) => {
-  console.log("rootReducer", action)
   if (action.type === "auth/logOut") {
     console.log("logOut")
     return combinedReducer(undefined, action)
@@ -31,10 +30,10 @@ const persistConfig = {
   storage,
 }
 
-const persistedReducer = persistReducer(persistConfig, rootReducer)
+// const persistedReducer = persistReducer(persistConfig, rootReducer)
 
 export const store = configureStore({
-  reducer: persistedReducer,
+  reducer: rootReducer,
   middleware: getDefaultMiddleware => {
     return getDefaultMiddleware().concat(apiSlice.middleware)
   },

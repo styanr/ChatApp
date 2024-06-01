@@ -40,11 +40,9 @@ const baseQueryWithReauth = async (
     console.log(refreshResult)
 
     if (refreshResult?.data) {
-      const user = (api.getState() as RootState).auth.user
       const refreshData = refreshResult.data as TokenResponse
       ;(api.dispatch as AppDispatch)(
         setCredentials({
-          user,
           accessToken: refreshData.accessToken,
         }),
       )
@@ -61,6 +59,13 @@ const baseQueryWithReauth = async (
 
 export const apiSlice = createApi({
   baseQuery: baseQueryWithReauth,
-  endpoints: builder => ({}),
-  tagTypes: ["User", "Contact", "ChatRoom"],
+  endpoints: builder => ({
+    tokenRefresh: builder.mutation<TokenResponse, void>({
+      query: () => ({
+        url: "/token/refresh",
+        method: "POST",
+      }),
+    }),
+  }),
+  tagTypes: ["User", "Contact", "ChatRoom", "Message"],
 })

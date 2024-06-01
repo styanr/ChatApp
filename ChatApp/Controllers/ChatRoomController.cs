@@ -4,6 +4,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using ChatApp.Exceptions;
 using ChatApp.Models;
+using ChatApp.Models.ChatRooms;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -40,13 +41,13 @@ public class ChatRoomController : ControllerBase
     }
     
     [HttpGet("{chatId}")]
-    public async Task<ActionResult<ChatRoomSummary>> GetChat(Guid chatId)
+    public async Task<ActionResult<ChatRoomDetails>> GetChat(Guid chatId)
     {
         try
         {
             var userId = GetUserId();
-            var chatRoomSummary = await _chatRoomService.GetChatAsync(userId, chatId);
-            return Ok(chatRoomSummary);
+            var chatRoomDetails = await _chatRoomService.GetChatAsync(userId, chatId);
+            return chatRoomDetails;
         }
         catch (ChatRoomNotFoundException e)
         {

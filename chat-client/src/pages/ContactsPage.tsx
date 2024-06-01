@@ -156,23 +156,7 @@ const ContactsPage: FC<ContactsPageProps> = ({}) => {
                     className="flex items-center px-5 py-4"
                   >
                     <div className="relative">
-                      {user.profilePictureUrl ? (
-                        <img
-                          src={user.profilePictureUrl}
-                          alt={user.displayName}
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        <>
-                          <div className="relative w-12 h-12 rounded-full overflow-hidden">
-                            <img
-                              src="https://austinpeopleworks.com/wp-content/uploads/2020/12/blank-profile-picture-973460_1280.png"
-                              alt={user.displayName}
-                              className="w-full h-full object-cover"
-                            />
-                          </div>
-                        </>
-                      )}
+                      <ProfileImage src={user.profilePictureUrl} size={12} />
                     </div>
                     <div className="flex-1 ml-5">
                       <h2 className="font-semibold text-gray-100">

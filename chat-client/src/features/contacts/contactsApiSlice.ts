@@ -36,6 +36,7 @@ export const contactsApiSlice = apiSlice.injectEndpoints({
       invalidatesTags: (result, error, { contactUserId }) => [
         { type: "Contact" },
         { type: "User", id: contactUserId },
+        { type: "ChatRoom", id: "LIST" },
       ],
     }),
     deleteContact: builder.mutation<void, string>({
@@ -46,6 +47,7 @@ export const contactsApiSlice = apiSlice.injectEndpoints({
       invalidatesTags: (result, error, contactUserId) => [
         { type: "Contact" },
         { type: "User", id: contactUserId },
+        { type: "ChatRoom", id: "LIST" },
       ],
     }),
   }),

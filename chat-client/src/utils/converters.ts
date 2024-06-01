@@ -1,5 +1,7 @@
 function convertUTCtoLocal(utcString: string): string {
-  const utcDate = new Date(utcString + "Z") // Append 'Z' to indicate UTC time
+  const utcDate = new Date(
+    utcString.endsWith("Z") ? utcString : `${utcString}Z`,
+  )
   const now = new Date()
 
   const locales = navigator.languages || [] // Get user's preferred locales

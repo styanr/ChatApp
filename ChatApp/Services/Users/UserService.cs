@@ -18,9 +18,9 @@ namespace ChatApp.Services.Users
             _contactRepository = contactRepository;
         }
 
-        public async Task<UserListResponse> GetUsersAsync(UserSearchRequest request, Guid userId)
+        public async Task<UserListResponse> GetUsersForUserAsync(UserSearchRequest request, Guid userId)
         {
-            var pagedUsers = await FetchUsersAsync(request, userId);
+            var pagedUsers = await SearchUsersForUserAsync(request, userId);
 
             pagedUsers.Results.RemoveAll(user => user.Id == userId);
 
@@ -28,7 +28,7 @@ namespace ChatApp.Services.Users
             return userListResponse;
         }
 
-        public async Task<UserResponse> GetUserAsync(Guid id, Guid userId)
+        public async Task<UserResponse> GetUserForUserAsync(Guid id, Guid userId)
         {
             var user = await _userRepository.GetByIdAsync(id);
             if (user == null)
@@ -40,7 +40,19 @@ namespace ChatApp.Services.Users
             return userResponse;
         }
 
-        public async Task<PagedResult<User>> FetchUsersAsync(UserSearchRequest request, Guid userId)
+        public async Task<UserResponse> GetUser(Guid id)
+        {
+            var user = await _userRepository.GetByIdAsync(id);
+            if (user == null)
+            {
+                throw new UserNotFoundException("User not found");
+            }
+
+            var userResponse = MapUserToUserResponse(user);
+            return userResponse;
+        }
+
+        private async Task<PagedResult<User>> SearchUsersForUserAsync(UserSearchRequest request, Guid userId)
         {
             if (string.IsNullOrWhiteSpace(request.SearchTerm))
             {
@@ -93,6 +105,7 @@ namespace ChatApp.Services.Users
             );
         }
 
+        // userId is the ID of the user making the request. It is used to determine if the user is a contact of the user being fetched
         private async Task<UserResponse> MapUserToUserResponse(User user, Guid userId)
         {
             var contact = await _contactRepository.GetByIdWithIncludesAsync(userId, user.Id);
@@ -104,6 +117,19 @@ namespace ChatApp.Services.Users
                 user.Bio,
                 user.ProfilePictureUrl,
                 contact != null
+            );
+        }
+        
+        private UserResponse MapUserToUserResponse(User user)
+        {
+            return new UserResponse
+            (
+                user.Id,
+                user.Handle,
+                user.DisplayName,
+                user.Bio,
+                user.ProfilePictureUrl,
+                false
             );
         }
     }

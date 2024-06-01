@@ -10,13 +10,13 @@ import MePage from "./pages/MePage"
 import ContactsPage from "./pages/ContactsPage"
 import ContactPage from "./pages/ContactPage"
 import MessagesPage from "./pages/MessagesPage"
+import ConversationPage from "./pages/ConversationPage"
 
 const App = () => {
   return (
     <Routes>
       <Route path="/" element={<Layout />}>
         {/* public routes */}
-        <Route index element={<Public />} />
         <Route path="login" element={<AuthPage />} />
 
         {/* protected routes */}
@@ -26,6 +26,7 @@ const App = () => {
           <Route path="contacts" element={<ContactsPage />} />
           <Route path="contacts/:id" element={<ContactPage />} />
           <Route path="messages" element={<MessagesPage />} />
+          <Route path="messages/:id" element={<ConversationPage />} />
         </Route>
       </Route>
     </Routes>

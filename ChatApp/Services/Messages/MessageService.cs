@@ -14,6 +14,7 @@ public class MessageService : IMessageService
 
     public MessageService(IMessageRepository messageRepository, IChatRoomRepository chatRoomRepository)
     {
+        _messageRepository = messageRepository;
         _chatRoomRepository = chatRoomRepository;
     }
     
@@ -24,12 +25,13 @@ public class MessageService : IMessageService
         var messages = chatRoom.Messages
             .Where(m => !m.IsDeleted)
             .OrderByDescending(m => m.CreatedAt)
-            .Skip(request.PageSize * request.Page)
+            .Skip(request.PageSize * (request.Page - 1))
             .Take(request.PageSize)
-            .Select(MapMessageToResponse)
             .ToList();
         
-        return messages;
+        var orderedMessages = messages.OrderBy(m => m.CreatedAt).Select(MapMessageToResponse).ToList();
+        
+        return orderedMessages;
     }
 
     public async Task<MessageResponse> CreateMessageAsync(Guid chatRoomId, Guid userId, MessageCreate message)
@@ -91,7 +93,7 @@ public class MessageService : IMessageService
     
     private async Task<ChatRoom> GetChatRoomAsync(Guid chatRoomId, Guid userId)
     {
-        var chatRoom = await _chatRoomRepository.GetByIdAsync(chatRoomId);
+        var chatRoom = await _chatRoomRepository.GetChatRoomAsync(chatRoomId);
         if (chatRoom == null)
         {
             throw new Exception($"Chat room with ID {chatRoomId} not found.");

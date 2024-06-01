@@ -33,10 +33,16 @@ export const usersApiSlice = apiSlice.injectEndpoints({
       query: id => `users/${id}`,
       providesTags: (result, error, arg) => [{ type: "User", id: arg }],
     }),
+
+    getCurrentUser: builder.query<ContactSearchResult, void>({
+      query: () => "users/current",
+      providesTags: [{ type: "User", id: "current" }],
+    }),
   }),
 })
 
-export const { useGetUsersQuery, useGetUserByIdQuery } = usersApiSlice
+export const { useGetUsersQuery, useGetUserByIdQuery, useGetCurrentUserQuery } =
+  usersApiSlice
 
 export type {
   ContactSearchResult,

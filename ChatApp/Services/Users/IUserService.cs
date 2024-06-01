@@ -5,6 +5,7 @@ namespace ChatApp.Services.Users;
 
 public interface IUserService
 {
-    Task<UserListResponse> GetUsersAsync(UserSearchRequest request, Guid userId);
-    Task<UserResponse> GetUserAsync(Guid id, Guid userId);
+    Task<UserListResponse> GetUsersForUserAsync(UserSearchRequest request, Guid userId);
+    Task<UserResponse> GetUserForUserAsync(Guid id, Guid userId);
+    Task<UserResponse> GetUser(Guid id);
 }

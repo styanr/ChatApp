@@ -24,7 +24,7 @@ public class UserController : ControllerBase
     {
         var userId = GetUserId();
         
-        var users = await _userService.GetUsersAsync(request, userId);
+        var users = await _userService.GetUsersForUserAsync(request, userId);
         return users;
     }
     
@@ -35,12 +35,20 @@ public class UserController : ControllerBase
 
         try
         {
-            return await _userService.GetUserAsync(id, userId);
+            return await _userService.GetUserForUserAsync(id, userId);
         }
         catch (UserNotFoundException)
         {
             return NotFound();
         }
+    }
+    
+    [HttpGet("current")]
+    public async Task<ActionResult<UserResponse>> GetCurrentUser()
+    {
+        var userId = GetUserId();
+        
+        return await _userService.GetUser(userId);
     }
     
     

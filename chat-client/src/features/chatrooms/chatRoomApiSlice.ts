@@ -1,14 +1,6 @@
 import { apiSlice } from "../../app/api/apiSlice"
 
-interface Message {
-  id: string
-  chatRoomId: string
-  authorId: string
-  content: string
-  createdAt: string
-  editedAt: string
-  isDeleted: boolean
-}
+import { Message } from "../messages/messagesApiSlice"
 
 interface ChatRoomSummary {
   id: string
@@ -16,7 +8,18 @@ interface ChatRoomSummary {
   description: string
   pictureUrl: string
   createdAt: string
+  type: "direct" | "group"
   lastMessage: Message
+}
+
+interface ChatRoomDetails {
+  d: string
+  name: string
+  description: string
+  pictureUrl: string
+  createdAt: string
+  type: "direct" | "group"
+  userIds: string[]
 }
 
 interface GroupChatRoomCreateRequest {
@@ -39,14 +42,14 @@ export const chatRoomApiSlice = apiSlice.injectEndpoints({
   endpoints: builder => ({
     getChatRooms: builder.query<ChatRoomSummary[], void>({
       query: () => "chatrooms",
-      providesTags: ["ChatRoom"],
+      providesTags: [{ type: "ChatRoom", id: "LIST" }],
     }),
-    getChatRoomById: builder.query<ChatRoomSummary, string>({
+    getChatRoomById: builder.query<ChatRoomDetails, string>({
       query: id => `chatrooms/${id}`,
       providesTags: (result, error, id) => [{ type: "ChatRoom", id }],
     }),
     createGroupChatRoom: builder.mutation<
-      ChatRoomSummary,
+      ChatRoomDetails,
       GroupChatRoomCreateRequest
     >({
       query: body => ({
@@ -57,7 +60,7 @@ export const chatRoomApiSlice = apiSlice.injectEndpoints({
       invalidatesTags: ["ChatRoom"],
     }),
     updateGroupChatRoom: builder.mutation<
-      ChatRoomSummary,
+      ChatRoomDetails,
       GroupChatRoomUpdateRequest
     >({
       query: ({ id, ...body }) => ({
@@ -68,7 +71,7 @@ export const chatRoomApiSlice = apiSlice.injectEndpoints({
       invalidatesTags: (result, error, { id }) => [{ type: "ChatRoom", id }],
     }),
     createDirectChatRoom: builder.mutation<
-      ChatRoomSummary,
+      ChatRoomDetails,
       DirectChatRoomCreateRequest
     >({
       query: body => ({

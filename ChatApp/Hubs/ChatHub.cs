@@ -23,6 +23,7 @@ public class ChatHub : Hub
     
     public override async Task OnConnectedAsync()
     {
+        Console.WriteLine("Connected");
         var userId = GetUserId();
         
         var chatRooms = await _chatRoomService.GetAllAsync(userId);
@@ -53,6 +54,8 @@ public class ChatHub : Hub
         var userId = GetUserId();
         
         var messageResponse =  await _messageService.CreateMessageAsync(chatId, userId, message);
+        
+        Console.WriteLine("Sending message");
         
         await Clients.Group(chatId.ToString()).SendAsync("ReceiveMessage", messageResponse);
     }
