@@ -223,36 +223,51 @@ const MessagesPage: FC<MessagesPageProps> = ({}) => {
             </div>
           ) : (
             <div className="flex flex-col w-full">
-              {data.map((chatRoom, index) => (
-                <Link
-                  to={`/messages/${chatRoom.id}`}
-                  key={chatRoom.id}
-                  className={`flex items-center px-5 py-4 bg-${index % 2 === 0 ? "slate-900" : "gray-800"} hover:bg-indigo-900 active:bg-indigo-900 transition-colors`}
-                >
-                  <ProfileImage src={chatRoom.pictureUrl} size={12} />
-                  <div className="flex flex-row w-full justify-between items-center">
-                    <div className="flex flex-col ml-5">
-                      <span className="text-lg font-semibold">
-                        {chatRoom.name}
-                      </span>
-                      <span className="text-sm">
-                        {chatRoom.lastMessage
-                          ? chatRoom.lastMessage.content
-                          : "No messages"}
-                      </span>
-                    </div>
-                    <div className="flex flex-col ml-3">
-                      <span className="text-sm">
-                        {convertUTCtoLocal(
-                          chatRoom.lastMessage
-                            ? chatRoom.lastMessage.createdAt
-                            : chatRoom.createdAt,
-                        )}
-                      </span>
-                    </div>
-                  </div>
-                </Link>
-              ))}
+              {[...data]
+                .sort((a, b) => {
+                  if (
+                    (a.lastMessage?.createdAt ?? a.createdAt) >
+                    (b.lastMessage?.createdAt ?? b.createdAt)
+                  ) {
+                    return -1
+                  }
+                  return 1
+                })
+                .map(
+                  (chatRoom, index) => (
+                    console.log(chatRoom),
+                    (
+                      <Link
+                        to={`/messages/${chatRoom.id}`}
+                        key={chatRoom.id}
+                        className={`flex items-center px-5 py-4 bg-${index % 2 === 0 ? "slate-900" : "gray-800"} hover:bg-indigo-900 active:bg-indigo-900 transition-colors`}
+                      >
+                        <ProfileImage src={chatRoom.pictureUrl} size={12} />
+                        <div className="flex flex-row w-full justify-between items-center">
+                          <div className="flex flex-col ml-5">
+                            <span className="text-lg font-semibold">
+                              {chatRoom.name}
+                            </span>
+                            <span className="text-sm">
+                              {chatRoom.lastMessage
+                                ? chatRoom.lastMessage.content
+                                : "No messages"}
+                            </span>
+                          </div>
+                          <div className="flex flex-col ml-3">
+                            <span className="text-sm">
+                              {convertUTCtoLocal(
+                                chatRoom.lastMessage
+                                  ? chatRoom.lastMessage.createdAt
+                                  : chatRoom.createdAt,
+                              )}
+                            </span>
+                          </div>
+                        </div>
+                      </Link>
+                    )
+                  ),
+                )}
             </div>
           )}
           <div className="absolute bottom-0 right-0 p-5">

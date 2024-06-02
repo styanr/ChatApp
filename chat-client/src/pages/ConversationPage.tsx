@@ -18,6 +18,7 @@ const ConversationPage: FC<ConversationPageProps> = () => {
   const { id } = useParams()
   const [page, setPage] = useState(1)
   const [messageContent, setMessageContent] = useState("")
+  const [showScrollToBottom, setShowScrollToBottom] = useState(false)
 
   const {
     data: messages,
@@ -55,21 +56,33 @@ const ConversationPage: FC<ConversationPageProps> = () => {
   const messagesContainerRef = useRef<HTMLDivElement>(null)
 
   const scrollToBottom = () => {
+    console.log("scrolling")
     if (messageEndRef.current) {
       messageEndRef.current.scrollIntoView({ behavior: "smooth" })
     }
+    setShowScrollToBottom(false)
   }
 
   useEffect(() => {
     if (messagesContainerRef.current) {
       const { scrollTop, scrollHeight, clientHeight } =
         messagesContainerRef.current
-      const isAtBottom = scrollHeight - scrollTop === clientHeight
+      console.log(scrollTop - scrollHeight + clientHeight)
+      const isAtBottom = Math.abs(scrollTop - scrollHeight + clientHeight) < 100
       if (isAtBottom) {
         scrollToBottom()
+      } else {
+        setShowScrollToBottom(true)
       }
     }
   }, [messages])
+
+  useEffect(() => {
+    if (messagesContainerRef.current) {
+      const { scrollHeight } = messagesContainerRef.current
+      messagesContainerRef.current.scrollTop = scrollHeight
+    }
+  }, [id])
 
   const handleSendMessage = async () => {
     if (messageContent.trim()) {
@@ -115,7 +128,7 @@ const ConversationPage: FC<ConversationPageProps> = () => {
             otherUser && (
               <Link
                 to={`/contacts/${otherUserId}`}
-                className="flex items-center gap-2 px-5 py-4 bg-slate-800 hover:bg-gray-700 transition-colors duration-300 z-10"
+                className="fixed top-0 left-0 right-0 flex items-center px-5 py-4 bg-slate-800 hover:bg-gray-700 transition-colors duration-300 z-10"
               >
                 <ProfileImage src={otherUser.profilePictureUrl} size={12} />
                 <h2 className="font-semibold ml-4">{otherUser.displayName}</h2>
@@ -139,6 +152,27 @@ const ConversationPage: FC<ConversationPageProps> = () => {
           ))}
         <div ref={messageEndRef}></div>
       </div>
+      {showScrollToBottom && (
+        <button
+          onClick={scrollToBottom}
+          className="absolute bottom-24 right-4 bg-indigo-800 hover:bg-indigo-900 text-white font-bold py-2 px-4 rounded-full shadow-lg transition-colors duration-300 z-20 aspect-square"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-6 w-6"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M19 14l-7 7m0 0l-7-7m7 7V3"
+            />
+          </svg>
+        </button>
+      )}
       <div className="flex p-4 gap-2 bg-slate-800 z-10">
         <input
           type="text"
