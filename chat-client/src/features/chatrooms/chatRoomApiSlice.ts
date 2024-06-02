@@ -13,7 +13,7 @@ interface ChatRoomSummary {
 }
 
 interface ChatRoomDetails {
-  d: string
+  id: string
   name: string
   description: string
   pictureUrl: string
@@ -36,6 +36,11 @@ interface GroupChatRoomUpdateRequest {
 
 interface DirectChatRoomCreateRequest {
   otherUserId: string
+}
+
+interface GroupChatRoomAddUsersRequest {
+  id: string
+  userIds: string[]
 }
 
 export const chatRoomApiSlice = apiSlice.injectEndpoints({
@@ -68,6 +73,20 @@ export const chatRoomApiSlice = apiSlice.injectEndpoints({
         method: "PUT",
         body: JSON.stringify(body),
       }),
+      invalidatesTags: (result, error, { id }) => [
+        { type: "ChatRoom", id },
+        { type: "ChatRoom", id: "LIST" },
+      ],
+    }),
+    addUsersToGroupChatRoom: builder.mutation<
+      ChatRoomDetails,
+      GroupChatRoomAddUsersRequest
+    >({
+      query: ({ userIds, ...body }) => ({
+        url: `chatrooms/${body.id}/users`,
+        method: "POST",
+        body: JSON.stringify({ userIds }),
+      }),
       invalidatesTags: (result, error, { id }) => [{ type: "ChatRoom", id }],
     }),
     createDirectChatRoom: builder.mutation<
@@ -90,12 +109,15 @@ export const {
   useCreateGroupChatRoomMutation,
   useUpdateGroupChatRoomMutation,
   useCreateDirectChatRoomMutation,
+  useAddUsersToGroupChatRoomMutation,
 } = chatRoomApiSlice
 
 export type {
   Message,
   ChatRoomSummary,
+  ChatRoomDetails,
   GroupChatRoomCreateRequest,
   GroupChatRoomUpdateRequest,
   DirectChatRoomCreateRequest,
+  GroupChatRoomAddUsersRequest,
 }

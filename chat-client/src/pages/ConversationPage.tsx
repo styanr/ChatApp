@@ -4,13 +4,21 @@ import {
   useGetMessagesQuery,
   useSendMessageMutation,
 } from "../features/messages/messagesApiSlice"
-import { useGetChatRoomByIdQuery } from "../features/chatrooms/chatRoomApiSlice"
+import {
+  useGetChatRoomByIdQuery,
+  useUpdateGroupChatRoomMutation,
+  useAddUsersToGroupChatRoomMutation,
+} from "../features/chatrooms/chatRoomApiSlice"
 import {
   useGetCurrentUserQuery,
   useGetUserByIdQuery,
 } from "../features/users/usersApiSlice"
+import { useGetContactsQuery } from "../features/contacts/contactsApiSlice"
+
 import ProfileImage from "../components/ProfileImage"
 import { convertUTCtoLocal } from "../utils/converters"
+
+import ViewGroupChatRoomModal from "../components/ViewGroupChatModal"
 
 interface ConversationPageProps {}
 
@@ -19,6 +27,7 @@ const ConversationPage: FC<ConversationPageProps> = () => {
   const [page, setPage] = useState(1)
   const [messageContent, setMessageContent] = useState("")
   const [showScrollToBottom, setShowScrollToBottom] = useState(false)
+  const [showInfoModal, setShowInfoModal] = useState(false)
 
   const {
     data: messages,
@@ -56,7 +65,6 @@ const ConversationPage: FC<ConversationPageProps> = () => {
   const messagesContainerRef = useRef<HTMLDivElement>(null)
 
   const scrollToBottom = () => {
-    console.log("scrolling")
     if (messageEndRef.current) {
       messageEndRef.current.scrollIntoView({ behavior: "smooth" })
     }
@@ -67,7 +75,6 @@ const ConversationPage: FC<ConversationPageProps> = () => {
     if (messagesContainerRef.current) {
       const { scrollTop, scrollHeight, clientHeight } =
         messagesContainerRef.current
-      console.log(scrollTop - scrollHeight + clientHeight)
       const isAtBottom = Math.abs(scrollTop - scrollHeight + clientHeight) < 100
       if (isAtBottom) {
         scrollToBottom()
@@ -120,10 +127,13 @@ const ConversationPage: FC<ConversationPageProps> = () => {
       {chatRoom && (
         <>
           {isGroupChat ? (
-            <div className="fixed top-0 left-0 right-0 flex items-center px-5 py-4 bg-slate-800 hover:bg-gray-700 transition-colors duration-300 z-10">
+            <button
+              className="fixed top-0 left-0 right-0 flex items-center px-5 py-4 bg-slate-800 hover:bg-gray-700 transition-colors duration-300 z-10"
+              onClick={() => setShowInfoModal(true)}
+            >
               <ProfileImage src={chatRoom.pictureUrl} size={12} />
               <h2 className="font-semibold ml-4">{chatRoom.name}</h2>
-            </div>
+            </button>
           ) : (
             otherUser && (
               <Link
@@ -188,6 +198,12 @@ const ConversationPage: FC<ConversationPageProps> = () => {
           Send
         </button>
       </div>
+      {showInfoModal && (
+        <ViewGroupChatRoomModal
+          chatRoom={chatRoom!}
+          onClose={() => setShowInfoModal(false)}
+        />
+      )}
     </div>
   )
 }

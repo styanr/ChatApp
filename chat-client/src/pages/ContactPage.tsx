@@ -1,6 +1,9 @@
 import React, { FC, useState } from "react"
 import { useParams } from "react-router-dom"
-import { useGetUserByIdQuery } from "../features/users/usersApiSlice"
+import {
+  useGetUserByIdQuery,
+  useGetCurrentUserQuery,
+} from "../features/users/usersApiSlice"
 import {
   useAddContactMutation,
   useUpdateContactMutation,
@@ -12,6 +15,8 @@ import ProfileImage from "../components/ProfileImage"
 import { Menu, MenuItem, MenuButton } from "@szhsin/react-menu"
 
 import { RiDeleteBin6Fill, RiEdit2Fill, RiMore2Fill } from "react-icons/ri"
+
+import { Navigate } from "react-router-dom"
 
 interface ContactPageProps {}
 
@@ -25,7 +30,7 @@ const BaseContactPage: FC<{ children: React.ReactNode }> = ({ children }) => {
 
 const InfoCard: FC<{ title: string; value: string }> = ({ title, value }) => {
   return (
-    <div className="flex flex-col w-full bg-slate-800 p-6 rounded-lg overflow-scroll">
+    <div className="flex flex-col w-full bg-slate-800 p-6 rounded-lg overflow-hidden shadow-lg">
       <h2 className="text-lg font-bold mb-1">{title}</h2>
       <p className="">{value}</p>
     </div>
@@ -94,6 +99,8 @@ const ContactPage: FC<ContactPageProps> = ({}) => {
 
   const [showEditModal, setShowEditModal] = useState(false)
 
+  const { data: currentUser } = useGetCurrentUserQuery()
+
   const handleUpdateContact = (newDisplayName: string) => {
     updateContact({ contactUserId: id as string, displayName: newDisplayName })
     setShowEditModal(false)
@@ -117,6 +124,10 @@ const ContactPage: FC<ContactPageProps> = ({}) => {
         Error: {"message" in error ? error.message : "An error occurred"}
       </BaseContactPage>
     )
+  }
+
+  if (currentUser?.id === id) {
+    return <Navigate to="/me" />
   }
 
   return (
