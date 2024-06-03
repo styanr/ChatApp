@@ -4,6 +4,7 @@ import { Link, useNavigate } from "react-router-dom"
 import { useAppDispatch } from "../app/store"
 import { setCredentials } from "../features/auth/authSlice"
 import { useLoginMutation } from "../features/auth/authApiSlice"
+import { initializeConnection } from "../app/signalRConnection"
 
 interface AuthPageProps {}
 
@@ -44,6 +45,8 @@ const AuthPage: FC<AuthPageProps> = ({}) => {
 
       setEmail("")
       setPassword("")
+
+      initializeConnection()
 
       navigate("/welcome")
     } catch (err: any) {

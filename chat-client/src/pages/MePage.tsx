@@ -2,6 +2,7 @@ import React, { FC } from "react"
 
 import { useAppDispatch } from "../app/store"
 import { logOut } from "../features/auth/authSlice"
+import { stopConnection } from "../app/signalRConnection"
 
 interface MePageProps {}
 
@@ -10,6 +11,7 @@ const MePage: FC<MePageProps> = ({}) => {
 
   const handleLogOut = () => {
     dispatch(logOut())
+    stopConnection()
   }
 
   return (

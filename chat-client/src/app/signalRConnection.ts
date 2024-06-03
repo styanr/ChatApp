@@ -41,16 +41,8 @@ export const initializeConnection = async (): Promise<void> => {
     token = state.auth.token as string
   }
 
+  console.log("Token: ", token)
   connection = createConnection(token)
-
-  const startConnection = async () => {
-    try {
-      await connection?.start()
-      console.log("Connection started")
-    } catch (error) {
-      console.error("Error starting connection: ", error)
-    }
-  }
 
   console.log("Connection state: ", connection?.state)
   if (connection.state === "Disconnected") {
@@ -66,6 +58,24 @@ export const initializeConnection = async (): Promise<void> => {
       await startConnection()
     }
   })
+}
+
+export const startConnection = async () => {
+  try {
+    await connection?.start()
+    console.log("Connection started")
+  } catch (error) {
+    console.error("Error starting connection: ", error)
+  }
+}
+
+export const stopConnection = async () => {
+  try {
+    await connection?.stop()
+    console.log("Connection stopped")
+  } catch (error) {
+    console.error("Error stopping connection: ", error)
+  }
 }
 
 initializeConnection()

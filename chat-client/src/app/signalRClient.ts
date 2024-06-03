@@ -7,12 +7,15 @@ import {
 import { setupSignalRListeners } from "./signalRHandlers"
 
 let connection: HubConnection | null = null
+let accessToken: string | null = null
 
 const createConnection = (token: string) => {
-  if (connection) {
+  if (accessToken === token && connection) {
     console.log("Returning existing connection.")
     return connection
   }
+
+  accessToken = token
 
   console.log("Creating new connection. Token: ", token)
 
