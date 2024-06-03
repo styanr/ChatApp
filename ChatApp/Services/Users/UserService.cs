@@ -52,6 +52,25 @@ namespace ChatApp.Services.Users
             return userResponse;
         }
 
+        public async Task<UserResponse> UpdateUserAsync(Guid id, UserUpdate request)
+        {
+            var user = await _userRepository.GetByIdAsync(id);
+            
+            if (user == null)
+            {
+                throw new UserNotFoundException("User not found");
+            }
+            
+            user.DisplayName = request.DisplayName;
+            user.Bio = request.Bio ?? string.Empty;
+            user.ProfilePictureUrl = request.ProfilePictureUrl ?? string.Empty;
+            user.Handle = request.Handle ?? string.Empty;
+            
+            await _userRepository.UpdateAsync(user);
+            
+            return MapUserToUserResponse(user);
+        }
+
         private async Task<PagedResult<User>> SearchUsersForUserAsync(UserSearchRequest request, Guid userId)
         {
             if (string.IsNullOrWhiteSpace(request.SearchTerm))

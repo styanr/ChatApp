@@ -51,6 +51,21 @@ public class UserController : ControllerBase
         return await _userService.GetUser(userId);
     }
     
+    [HttpPut("current")]
+    public async Task<ActionResult<UserResponse>> UpdateUser([FromBody] UserUpdate request)
+    {
+        var userId = GetUserId();
+        
+        try
+        {
+            return await _userService.UpdateUserAsync(userId, request);
+        }
+        catch (UserNotFoundException)
+        {
+            return NotFound();
+        }
+    }
+    
     
     private Guid GetUserId()
     {

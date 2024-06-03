@@ -25,7 +25,8 @@ public class ChatHub : Hub
     {
         Console.WriteLine("Connected");
         var userId = GetUserId();
-        
+
+        // TODO: Improve performance
         var chatRooms = await _chatRoomService.GetAllAsync(userId);
         
         foreach (var chatRoom in chatRooms)
