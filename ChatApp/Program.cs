@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Microsoft.Extensions.Azure;
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
@@ -124,6 +125,11 @@ builder.Services.AddCors(options =>
             .SetIsOriginAllowed(_ => true)
             .AllowCredentials();
     });
+});
+builder.Services.AddAzureClients(clientBuilder =>
+{
+    clientBuilder.AddBlobServiceClient(builder.Configuration["Azurite:blob"], preferMsi: true);
+    clientBuilder.AddQueueServiceClient(builder.Configuration["Azurite:queue"], preferMsi: true);
 });
 
 var app = builder.Build();
