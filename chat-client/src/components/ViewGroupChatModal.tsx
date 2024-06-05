@@ -48,7 +48,7 @@ const ViewGroupChatModal: FC<ViewGroupChatModalProps> = ({
             )}
             <div className="flex justify-between items-center">
               <div className="flex items-center gap-4">
-                <ProfileImage src={chatRoom.pictureUrl} size={20} />
+                <ProfileImage id={chatRoom.pictureId} size={20} />
                 <div>
                   <h2 className="text-xl font-semibold">{chatRoom.name}</h2>
                   <p>
@@ -109,7 +109,7 @@ const EditGroupChatModal: FC<ViewGroupChatModalProps> = ({
   const [groupChat, setGroupChat] = useState<GroupChatRoomUpdateRequest>({
     id: chatRoom.id,
     name: chatRoom.name,
-    pictureUrl: chatRoom.pictureUrl,
+    pictureId: chatRoom.pictureId,
     description: chatRoom.description || "",
   })
 
@@ -150,9 +150,9 @@ const EditGroupChatModal: FC<ViewGroupChatModalProps> = ({
         <input
           type="text"
           id="picture"
-          value={groupChat.pictureUrl}
+          value={groupChat.pictureId}
           onChange={e =>
-            setGroupChat({ ...groupChat, pictureUrl: e.target.value })
+            setGroupChat({ ...groupChat, pictureId: e.target.value })
           }
           className="bg-slate-700 text-white w-full p-2 rounded-lg mt-1"
         />
@@ -223,7 +223,7 @@ const AddUsersToGroupChatModal: FC<ViewGroupChatModalProps> = ({
                 className={`flex items-center justify-between gap-2 py-3 px-5 ${userIds.includes(contact.id) ? "bg-slate-700" : ""} rounded-lg transition-colors duration-300 min-w-80`}
               >
                 <div className="flex items-center gap-2">
-                  <ProfileImage src={contact.profilePictureUrl} size={10} />
+                  <ProfileImage id={contact.profilePictureId} size={10} />
                   <p className="ml-2">{contact.displayName}</p>
                 </div>
 
@@ -283,7 +283,7 @@ const UserListItem: FC<{ userId: string }> = ({ userId }) => {
     "
       to={`/contacts/${userId}`}
     >
-      <ProfileImage src={user.profilePictureUrl} size={10} />
+      <ProfileImage id={user.profilePictureId} size={10} />
       <p>{user.displayName}</p>
     </Link>
   )

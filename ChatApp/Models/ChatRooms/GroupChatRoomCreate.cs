@@ -1,3 +1,3 @@
 ﻿namespace ChatApp.Models.Messages;
 
-public record GroupChatRoomCreate(String Name, String? PictureUrl);
+public record GroupChatRoomCreate(String Name, Guid? PictureId);

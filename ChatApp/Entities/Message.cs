@@ -14,6 +14,7 @@ public class Message
     public User Author { get; set; }
     
     public string Content { get; set; }
+    public List<Guid> FileIds { get; set; } = new();
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime? EditedAt { get; set; }
     public Boolean IsDeleted { get; set; } = false;

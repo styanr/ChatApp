@@ -131,7 +131,7 @@ const ConversationPage: FC<ConversationPageProps> = () => {
               className="fixed top-0 left-0 right-0 flex items-center px-5 py-4 bg-slate-800 hover:bg-gray-700 transition-colors duration-300 z-10"
               onClick={() => setShowInfoModal(true)}
             >
-              <ProfileImage src={chatRoom.pictureUrl} size={12} />
+              <ProfileImage id={chatRoom.pictureUrl} size={12} />
               <h2 className="font-semibold ml-4">{chatRoom.name}</h2>
             </button>
           ) : (
@@ -140,7 +140,7 @@ const ConversationPage: FC<ConversationPageProps> = () => {
                 to={`/contacts/${otherUserId}`}
                 className="fixed top-0 left-0 right-0 flex items-center px-5 py-4 bg-slate-800 hover:bg-gray-700 transition-colors duration-300 z-10"
               >
-                <ProfileImage src={otherUser.profilePictureUrl} size={12} />
+                <ProfileImage id={otherUser.profilePictureUrl} size={12} />
                 <h2 className="font-semibold ml-4">{otherUser.displayName}</h2>
               </Link>
             )

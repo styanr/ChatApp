@@ -245,7 +245,7 @@ const MessagesPage: FC<MessagesPageProps> = ({}) => {
                         key={chatRoom.id}
                         className={`flex items-center px-5 py-4 bg-${index % 2 === 0 ? "slate-900" : "gray-800"} hover:bg-indigo-900 active:bg-indigo-900 transition-colors`}
                       >
-                        <ProfileImage src={chatRoom.pictureUrl} size={12} />
+                        <ProfileImage id={chatRoom.pictureUrl} size={12} />
                         <div className="flex flex-row w-full justify-between items-center">
                           <div className="flex flex-col ml-5">
                             <span className="text-lg font-semibold">

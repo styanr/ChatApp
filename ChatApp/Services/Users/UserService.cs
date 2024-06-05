@@ -63,7 +63,7 @@ namespace ChatApp.Services.Users
             
             user.DisplayName = request.DisplayName;
             user.Bio = request.Bio ?? string.Empty;
-            user.ProfilePictureUrl = request.ProfilePictureUrl ?? string.Empty;
+            user.ProfilePictureId = request.ProfilePictureId ?? Guid.Empty;
             user.Handle = request.Handle ?? string.Empty;
             
             await _userRepository.UpdateAsync(user);
@@ -134,7 +134,7 @@ namespace ChatApp.Services.Users
                 user.Handle,
                 contact?.CustomName ?? user.DisplayName,
                 user.Bio,
-                user.ProfilePictureUrl,
+                user.ProfilePictureId,
                 contact != null
             );
         }
@@ -147,7 +147,7 @@ namespace ChatApp.Services.Users
                 user.Handle,
                 user.DisplayName,
                 user.Bio,
-                user.ProfilePictureUrl,
+                user.ProfilePictureId,
                 false
             );
         }

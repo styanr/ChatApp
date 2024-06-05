@@ -110,7 +110,7 @@ public class ContactService : IContactService
     // TODO: Move these methods to a mapper class
     private UserResponse MapContactToUserResponse(Contact contact)
     {
-        return new UserResponse(contact.ContactId, contact.ContactUser.Handle, contact.CustomName, contact.ContactUser.Bio, contact.ContactUser.ProfilePictureUrl, true);
+        return new UserResponse(contact.ContactId, contact.ContactUser.Handle, contact.CustomName, contact.ContactUser.Bio, contact.ContactUser.ProfilePictureId, true);
     }
 
     private UserListResponse MapPagedResultToUserListResponse(PagedResult<Contact> pagedResult)

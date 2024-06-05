@@ -96,7 +96,7 @@ namespace ChatApp.Services.ChatRooms
             var groupChatRoom = new GroupChatRoom
             {
                 Name = groupChatRoomCreate.Name ?? throw new ArgumentNullException(nameof(groupChatRoomCreate.Name)),
-                PictureUrl = groupChatRoomCreate.PictureUrl,
+                PictureId = groupChatRoomCreate.PictureId,
                 UserList = [user]
             };
 
@@ -181,7 +181,7 @@ namespace ChatApp.Services.ChatRooms
 
             chatRoom.Name = chatRoomUpdate.Name ?? chatRoom.Name;
             chatRoom.Description = chatRoomUpdate.Description ?? chatRoom.Description;
-            chatRoom.PictureUrl = chatRoomUpdate.PictureUrl ?? chatRoom.PictureUrl;
+            chatRoom.PictureId = chatRoomUpdate.PictureId ?? chatRoom.PictureId;
 
             await _chatRoomRepository.UpdateAsync(chatRoom);
 

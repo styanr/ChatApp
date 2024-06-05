@@ -7,36 +7,28 @@ namespace ChatApp.Controllers;
 [ApiController]
 public class FilesController : ControllerBase
 {
-    private readonly IBlobService _blobService;
+    private readonly IProfilePictureService _profilePictureService;
 
-    public FilesController(IBlobService blobService)
+    public FilesController(IProfilePictureService profilePictureService)
     {
-        _blobService = blobService;
+        _profilePictureService = profilePictureService;
     }
 
-    [HttpPost]
+    [HttpPost("profile-pictures")]
     public async Task<ActionResult<Guid>> UploadAsync(IFormFile file, CancellationToken cancellationToken)
     {
         await using var stream = file.OpenReadStream();
 
-        var id = await _blobService.UploadAsync(stream, file.ContentType, cancellationToken);
+        var id = await _profilePictureService.UploadProfilePictureAsync(stream, file.ContentType, cancellationToken);
 
         return Ok(id);
     }
 
-    [HttpGet("{id}")]
+    [HttpGet("profile-pictures/{id}")]
     public async Task<FileStreamResult> DownloadAsync(Guid id, CancellationToken cancellationToken)
     {
-        var response = await _blobService.DownloadAsync(id, cancellationToken);
+        var response = await _profilePictureService.DownloadProfilePictureAsync(id, cancellationToken);
 
         return File(response.Stream, response.ContentType);
-    }
-
-    [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteAsync(Guid id, CancellationToken cancellationToken)
-    {
-        await _blobService.DeleteAsync(id, cancellationToken);
-
-        return NoContent();
     }
 }

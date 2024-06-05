@@ -6,7 +6,7 @@ interface ChatRoomSummary {
   id: string
   name: string
   description: string
-  pictureUrl: string
+  pictureId: string
   createdAt: string
   type: "direct" | "group"
   lastMessage: Message
@@ -16,7 +16,7 @@ interface ChatRoomDetails {
   id: string
   name: string
   description: string
-  pictureUrl: string
+  pictureId: string
   createdAt: string
   type: "direct" | "group"
   userIds: string[]
@@ -24,13 +24,13 @@ interface ChatRoomDetails {
 
 interface GroupChatRoomCreateRequest {
   name: string
-  pictureUrl: string
+  pictureId: string
 }
 
 interface GroupChatRoomUpdateRequest {
   id: string
   name: string
-  pictureUrl: string
+  pictureId: string
   description: string
 }
 

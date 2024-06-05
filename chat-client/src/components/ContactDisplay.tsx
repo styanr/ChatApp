@@ -30,7 +30,7 @@ const ContactDisplay: FC<ContactDisplayProps> = ({
       <div className="flex flex-col w-full">
         <div className="flex flex-row items-center justify-between p-6">
           <div className="flex flex-row items-center">
-            <ProfileImage src={data?.profilePictureUrl} size={16} />
+            <ProfileImage id={data?.profilePictureId} size={16} />
             <div className="ml-4">
               <h2 className="text-xl font-bold">{data?.displayName}</h2>
               {!isCurrentUser && (

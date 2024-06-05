@@ -41,7 +41,7 @@ public class AuthService : IAuthService
             Email = request.Email,
             DisplayName = request.DisplayName,
             Bio = request.Bio,
-            ProfilePictureUrl = request.ProfilePictureUrl,
+            ProfilePictureId = request.ProfilePictureId,
             PasswordHash = passwordHash
         };
 

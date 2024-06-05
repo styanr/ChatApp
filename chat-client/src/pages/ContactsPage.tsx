@@ -127,7 +127,7 @@ const ContactsPage: FC<ContactsPageProps> = ({}) => {
                     className="flex items-center px-5 py-4"
                   >
                     <div className="relative">
-                      <ProfileImage src={contact.profilePictureUrl} size={12} />
+                      <ProfileImage id={contact.profilePictureId} size={12} />
                     </div>
                     <div className="flex-1 ml-5">
                       <h2 className="font-semibold text-gray-100">
@@ -156,7 +156,7 @@ const ContactsPage: FC<ContactsPageProps> = ({}) => {
                     className="flex items-center px-5 py-4"
                   >
                     <div className="relative">
-                      <ProfileImage src={user.profilePictureUrl} size={12} />
+                      <ProfileImage id={user.profilePictureId} size={12} />
                     </div>
                     <div className="flex-1 ml-5">
                       <h2 className="font-semibold text-gray-100">

@@ -28,7 +28,7 @@ public static class ChatRoomExtensions
             chatRoom.Id,
             contact?.CustomName ?? otherUser.DisplayName,
             otherUser.Bio,
-            otherUser.ProfilePictureUrl,
+            otherUser.ProfilePictureId,
             chatRoom.CreatedAt,
             "direct",
             chatRoom.GetLastMessage()?.ToMessageResponse()
@@ -42,7 +42,7 @@ public static class ChatRoomExtensions
             chatRoom.Id,
             chatRoom.Name,
             chatRoom.Description,
-            chatRoom.PictureUrl,
+            chatRoom.PictureId,
             chatRoom.CreatedAt,
             "group",
             chatRoom.GetLastMessage()?.ToMessageResponse()
@@ -76,7 +76,7 @@ public static class ChatRoomExtensions
             chatRoom.Id,
             contact?.CustomName ?? otherUser.DisplayName,
             otherUser.Bio,
-            otherUser.ProfilePictureUrl,
+            otherUser.ProfilePictureId,
             chatRoom.CreatedAt,
             "direct",
             chatRoom.Users.Select(u => u.Id)
@@ -90,7 +90,7 @@ public static class ChatRoomExtensions
             chatRoom.Id,
             chatRoom.Name,
             chatRoom.Description,
-            chatRoom.PictureUrl,
+            chatRoom.PictureId,
             chatRoom.CreatedAt,
             "group",
             chatRoom.Users.Select(u => u.Id)

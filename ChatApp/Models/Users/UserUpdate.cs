@@ -1,3 +1,3 @@
 ﻿namespace ChatApp.Models.Users;
 
-public record UserUpdate(string DisplayName, string? ProfilePictureUrl, string? Bio, string? Handle);
+public record UserUpdate(string DisplayName, Guid? ProfilePictureId, string? Bio, string? Handle);

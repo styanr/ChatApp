@@ -14,6 +14,10 @@ import { initializeConnection } from "./app/signalRConnection"
 import { PersistGate } from "redux-persist/integration/react"
 import { persistStore } from "redux-persist"
 
+import axios from "axios"
+
+axios.defaults.baseURL = "http://localhost:5117"
+
 const container = document.getElementById("root")
 
 let persistor = persistStore(store)

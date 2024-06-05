@@ -5,7 +5,7 @@ interface ContactSearchResult {
   handle: string | null
   displayName: string
   bio: string | null
-  profilePictureUrl: string | undefined
+  profilePictureId: string | undefined
   isContact: boolean
 }
 
@@ -26,7 +26,7 @@ interface UserUpdate {
   handle: string | null
   displayName: string
   bio: string | null
-  profilePictureUrl: string | undefined
+  profilePictureId: string | undefined
 }
 
 export const usersApiSlice = apiSlice.injectEndpoints({

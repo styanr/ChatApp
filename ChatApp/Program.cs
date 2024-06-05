@@ -46,6 +46,8 @@ builder.Services.AddScoped<IContactRepository, ContactRepository>();
 builder.Services.AddTransient<IPasswordHasher, PasswordHasher>();
 builder.Services.AddTransient<JwtUtil>();
 
+builder.Services.AddSingleton<IBlobService, BlobService>();
+
 builder.Services.AddScoped<IUserManager, UserManager>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IChatRoomService, ChatRoomService>();
@@ -53,7 +55,7 @@ builder.Services.AddScoped<IMessageService, MessageService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IContactService, ContactService>();
 
-builder.Services.AddSingleton<IBlobService, BlobService>();
+builder.Services.AddSingleton<IProfilePictureService, ProfilePictureService>();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(x =>
 {
