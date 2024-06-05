@@ -7,6 +7,7 @@ using ChatApp.Repositories.Contacts;
 using ChatApp.Repositories.Messages;
 using ChatApp.Repositories.Users;
 using ChatApp.Services.Auth;
+using ChatApp.Services.Blobs;
 using ChatApp.Services.ChatRooms;
 using ChatApp.Services.Contacts;
 using ChatApp.Services.Messages;
@@ -51,6 +52,8 @@ builder.Services.AddScoped<IChatRoomService, ChatRoomService>();
 builder.Services.AddScoped<IMessageService, MessageService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IContactService, ContactService>();
+
+builder.Services.AddSingleton<IBlobService, BlobService>();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(x =>
 {
