@@ -1,5 +1,6 @@
 ﻿using ChatApp.Exceptions;
 using ChatApp.Models.Files;
+using ImageMagick;
 
 namespace ChatApp.Services.Blobs;
 
@@ -23,8 +24,20 @@ public class ProfilePictureService : IProfilePictureService
         {
             throw new InvalidFileException("File is too large");
         }
+
+        using MagickImage image = new MagickImage(stream);
         
-        return await _blobService.UploadAsync(stream, contentType, "images", cancellationToken);
+        var side = Math.Min(image.Width, image.Height);
+        image.Crop(side, side, Gravity.Center);
+        
+        image.Format = MagickFormat.Jpeg;
+        image.Quality = 80;
+        
+        using var memoryStream = new MemoryStream();
+        await image.WriteAsync(memoryStream);
+        memoryStream.Position = 0;
+
+        return await _blobService.UploadAsync(memoryStream, contentType, "images", cancellationToken);
     }
 
     public async Task<FileResponse> DownloadProfilePictureAsync(Guid id, CancellationToken cancellationToken = default)
