@@ -25,8 +25,7 @@ public class ChatHub : Hub
     {
         Console.WriteLine("Connected");
         var userId = GetUserId();
-
-        // TODO: Improve performance
+        
         var chatRooms = await _chatRoomService.GetAllAsync(userId);
         
         foreach (var chatRoom in chatRooms)
@@ -59,6 +58,24 @@ public class ChatHub : Hub
         Console.WriteLine("Sending message");
         
         await Clients.Group(chatId.ToString()).SendAsync("ReceiveMessage", messageResponse);
+    }
+    
+    public async Task EditMessage(Guid messageId, MessageUpdate message)
+    {
+        var userId = GetUserId();
+        
+        var messageResponse = await _messageService.EditMessageAsync(messageId, userId, message);
+        
+        await Clients.Group(messageResponse.ChatRoomId.ToString()).SendAsync("ReceiveEditMessage", messageResponse);
+    }
+    
+    public async Task DeleteMessage(Guid messageId)
+    {
+        var userId = GetUserId();
+        
+        var (chatRoomId, deletedMessageId) = await _messageService.DeleteMessageAsync(messageId, userId);
+        
+        await Clients.All.SendAsync("ReceiveDeleteMessage", chatRoomId, deletedMessageId);
     }
     
     private Guid GetUserId()

@@ -23,7 +23,6 @@ public class MessageService : IMessageService
         var chatRoom = await GetChatRoomAsync(chatRoomId, userId);
         
         var messages = chatRoom.Messages
-            .Where(m => !m.IsDeleted)
             .OrderByDescending(m => m.CreatedAt)
             .Skip(request.PageSize * (request.Page - 1))
             .Take(request.PageSize)
@@ -66,13 +65,14 @@ public class MessageService : IMessageService
         }
         
         existingMessage.Content = message.Content;
+        existingMessage.EditedAt = DateTime.UtcNow;
         
         await _messageRepository.UpdateAsync(existingMessage);
         
         return MapMessageToResponse(existingMessage);
     }
 
-    public async Task DeleteMessageAsync(Guid messageId, Guid userId)
+    public async Task<(Guid, Guid)> DeleteMessageAsync(Guid messageId, Guid userId)
     {
         var existingMessage = await _messageRepository.GetByIdAsync(messageId);
         
@@ -89,6 +89,8 @@ public class MessageService : IMessageService
         existingMessage.IsDeleted = true;
         
         await _messageRepository.UpdateAsync(existingMessage);
+        
+        return (existingMessage.ChatRoomId, existingMessage.Id);
     }
     
     private async Task<ChatRoom> GetChatRoomAsync(Guid chatRoomId, Guid userId)
@@ -109,6 +111,10 @@ public class MessageService : IMessageService
     
     private MessageResponse MapMessageToResponse(Message message)
     {
+        if (message.IsDeleted)
+        {
+            return new MessageResponse(message.Id, message.ChatRoomId, message.AuthorId, "This message has been deleted.", message.CreatedAt, message.EditedAt, message.IsDeleted);
+        }
         return new MessageResponse(message.Id, message.ChatRoomId, message.AuthorId, message.Content, message.CreatedAt, message.EditedAt, message.IsDeleted);
     }
 }

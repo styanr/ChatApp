@@ -42,7 +42,7 @@ const CreateChatRoomModal: FC<CreateChatRoomModalProps> = ({
     "group",
   )
   const [groupChatRoomRequest, setGroupChatRoomRequest] =
-    useState<GroupChatRoomCreateRequest>({ name: "", pictureUrl: "" })
+    useState<GroupChatRoomCreateRequest>({ name: "", pictureId: "" })
   const [directChatRoomRequest, setDirectChatRoomRequest] =
     useState<DirectChatRoomCreateRequest>({ otherUserId: "" })
 
@@ -119,7 +119,7 @@ const CreateChatRoomModal: FC<CreateChatRoomModalProps> = ({
               type="text"
               name="pictureUrl"
               className="rounded-md px-3 py-2 w-full mb-4 bg-gray-900 text-white"
-              value={groupChatRoomRequest.pictureUrl}
+              value={groupChatRoomRequest.pictureId}
               onChange={handleInputChange}
               placeholder="Picture URL"
             />
@@ -245,7 +245,7 @@ const MessagesPage: FC<MessagesPageProps> = ({}) => {
                         key={chatRoom.id}
                         className={`flex items-center px-5 py-4 bg-${index % 2 === 0 ? "slate-900" : "gray-800"} hover:bg-indigo-900 active:bg-indigo-900 transition-colors`}
                       >
-                        <ProfileImage id={chatRoom.pictureUrl} size={12} />
+                        <ProfileImage id={chatRoom.pictureId} size={12} />
                         <div className="flex flex-row w-full justify-between items-center">
                           <div className="flex flex-col ml-5">
                             <span className="text-lg font-semibold">

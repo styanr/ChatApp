@@ -3,12 +3,10 @@ import { Link, useParams } from "react-router-dom"
 import {
   useGetMessagesQuery,
   useSendMessageMutation,
+  useEditMessageMutation,
+  useDeleteMessageMutation,
 } from "../features/messages/messagesApiSlice"
-import {
-  useGetChatRoomByIdQuery,
-  useUpdateGroupChatRoomMutation,
-  useAddUsersToGroupChatRoomMutation,
-} from "../features/chatrooms/chatRoomApiSlice"
+import { useGetChatRoomByIdQuery } from "../features/chatrooms/chatRoomApiSlice"
 import {
   useGetCurrentUserQuery,
   useGetUserByIdQuery,
@@ -19,6 +17,8 @@ import ProfileImage from "../components/ProfileImage"
 import { convertUTCtoLocal } from "../utils/converters"
 
 import ViewGroupChatRoomModal from "../components/ViewGroupChatModal"
+
+import Message from "../components/Message"
 
 interface ConversationPageProps {}
 
@@ -39,6 +39,8 @@ const ConversationPage: FC<ConversationPageProps> = () => {
   })
 
   const [sendMessage] = useSendMessageMutation()
+  const [editMessage] = useEditMessageMutation()
+  const [deleteMessage] = useDeleteMessageMutation()
 
   const {
     data: chatRoom,
@@ -72,6 +74,7 @@ const ConversationPage: FC<ConversationPageProps> = () => {
   }
 
   useEffect(() => {
+    console.log(messages)
     if (messagesContainerRef.current) {
       const { scrollTop, scrollHeight, clientHeight } =
         messagesContainerRef.current
@@ -97,6 +100,14 @@ const ConversationPage: FC<ConversationPageProps> = () => {
       setMessageContent("")
       scrollToBottom()
     }
+  }
+
+  const handleEditMessage = async (messageId: string, newContent: string) => {
+    await editMessage({ id: messageId, content: newContent })
+  }
+
+  const handleDeleteMessage = async (messageId: string) => {
+    await deleteMessage(messageId)
   }
 
   if (
@@ -131,7 +142,7 @@ const ConversationPage: FC<ConversationPageProps> = () => {
               className="fixed top-0 left-0 right-0 flex items-center px-5 py-4 bg-slate-800 hover:bg-gray-700 transition-colors duration-300 z-10"
               onClick={() => setShowInfoModal(true)}
             >
-              <ProfileImage id={chatRoom.pictureUrl} size={12} />
+              <ProfileImage id={chatRoom.pictureId} size={12} />
               <h2 className="font-semibold ml-4">{chatRoom.name}</h2>
             </button>
           ) : (
@@ -140,7 +151,7 @@ const ConversationPage: FC<ConversationPageProps> = () => {
                 to={`/contacts/${otherUserId}`}
                 className="fixed top-0 left-0 right-0 flex items-center px-5 py-4 bg-slate-800 hover:bg-gray-700 transition-colors duration-300 z-10"
               >
-                <ProfileImage id={otherUser.profilePictureUrl} size={12} />
+                <ProfileImage id={otherUser.profilePictureId} size={12} />
                 <h2 className="font-semibold ml-4">{otherUser.displayName}</h2>
               </Link>
             )
@@ -158,6 +169,8 @@ const ConversationPage: FC<ConversationPageProps> = () => {
               message={message}
               isCurrentUser={message.authorId === currentUser?.id}
               isGroupChat={isGroupChat}
+              onEditMessage={handleEditMessage}
+              onDeleteMessage={handleDeleteMessage}
             />
           ))}
         <div ref={messageEndRef}></div>
@@ -204,50 +217,6 @@ const ConversationPage: FC<ConversationPageProps> = () => {
           onClose={() => setShowInfoModal(false)}
         />
       )}
-    </div>
-  )
-}
-
-interface MessageProps {
-  message: any
-  isCurrentUser: boolean
-  isGroupChat: boolean
-}
-
-const Message: FC<MessageProps> = ({ message, isCurrentUser, isGroupChat }) => {
-  const {
-    data: author,
-    error: authorError,
-    isLoading: authorLoading,
-  } = useGetUserByIdQuery(message.authorId)
-
-  if (authorLoading) {
-    return <div>Loading...</div>
-  }
-
-  if (authorError) {
-    return <div>Error...</div>
-  }
-
-  return (
-    <div
-      className={`flex flex-col gap-2 ${isCurrentUser ? "items-end" : "items-start"}`}
-    >
-      {isGroupChat && author && (
-        <div className="text-xs text-gray-400">{author.displayName}</div>
-      )}
-      <div
-        className={`px-5 py-3 mb-2 rounded-2xl w-fit ${
-          isCurrentUser
-            ? "ml-auto bg-blue-500 text-right"
-            : "mr-auto bg-slate-800 text-left"
-        }`}
-      >
-        <div className="text-white">{message.content}</div>
-        <div className="text-xs text-gray-400">
-          {convertUTCtoLocal(message.createdAt)}
-        </div>
-      </div>
     </div>
   )
 }

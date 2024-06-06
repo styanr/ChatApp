@@ -20,4 +20,34 @@ export const setupSignalRListeners = (connection: signalR.HubConnection) => {
       apiSlice.util.invalidateTags([{ type: "ChatRoom", id: "LIST" }]),
     )
   })
+  connection.on("ReceiveEditMessage", (message: Message) => {
+    console.log("ReceiveEditMessage", message)
+    store.dispatch(
+      messagesApiSlice.util.updateQueryData(
+        "getMessages",
+        { chatRoomId: message.chatRoomId, page: 1 },
+        draft => {
+          const index = draft.findIndex(m => m.id === message.id)
+          if (index !== -1) {
+            draft[index] = message
+          }
+        },
+      ),
+    )
+  })
+  connection.on("ReceiveDeleteMessage", (chatRoomId: string, messageId: string) => {
+    console.log("ReceiveDeleteMessage", messageId)
+    store.dispatch(
+      messagesApiSlice.util.updateQueryData(
+        "getMessages",
+        { chatRoomId: chatRoomId, page: 1 },
+        draft => {
+          const index = draft.findIndex(m => m.id === messageId)
+          if (index !== -1) {
+            draft[index].isDeleted = true
+          }
+        },
+      ),
+    )
+  })
 }
