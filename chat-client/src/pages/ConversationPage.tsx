@@ -11,14 +11,16 @@ import {
   useGetCurrentUserQuery,
   useGetUserByIdQuery,
 } from "../features/users/usersApiSlice"
-import { useGetContactsQuery } from "../features/contacts/contactsApiSlice"
 
 import ProfileImage from "../components/ProfileImage"
-import { convertUTCtoLocal } from "../utils/converters"
 
 import ViewGroupChatRoomModal from "../components/ViewGroupChatModal"
 
 import Message from "../components/Message"
+
+import { RiAttachment2, RiSendPlaneFill } from "react-icons/ri"
+
+import useFiles from "../app/hooks/useFiles"
 
 interface ConversationPageProps {}
 
@@ -28,6 +30,12 @@ const ConversationPage: FC<ConversationPageProps> = () => {
   const [messageContent, setMessageContent] = useState("")
   const [showScrollToBottom, setShowScrollToBottom] = useState(false)
   const [showInfoModal, setShowInfoModal] = useState(false)
+
+  const [attachment, setAttachment] = useState<File | null>(null)
+  const [attachmentId, setAttachmentId] = useState<string | null>(null)
+
+  const { uploadFile, getFile, isLoading, isUploading, error, uploadError } =
+    useFiles()
 
   const {
     data: messages,
@@ -95,9 +103,15 @@ const ConversationPage: FC<ConversationPageProps> = () => {
   }, [id])
 
   const handleSendMessage = async () => {
-    if (messageContent.trim()) {
-      await sendMessage({ chatRoomId: id as string, content: messageContent })
+    if (messageContent.trim() || attachmentId) {
+      await sendMessage({
+        chatRoomId: id as string,
+        content: messageContent,
+        attachmentId,
+      })
       setMessageContent("")
+      setAttachment(null)
+      setAttachmentId(null)
       scrollToBottom()
     }
   }
@@ -108,6 +122,26 @@ const ConversationPage: FC<ConversationPageProps> = () => {
 
   const handleDeleteMessage = async (messageId: string) => {
     await deleteMessage(messageId)
+  }
+
+  const handleFileChange = async (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const file = event.target.files?.[0]
+    if (file) {
+      setAttachment(file)
+
+      // Upload file and get the ID
+      const response = await uploadFile(file)
+      if (response) {
+        setAttachmentId(response)
+      }
+    }
+  }
+
+  const handleRemoveAttachment = () => {
+    setAttachment(null)
+    setAttachmentId(null)
   }
 
   if (
@@ -198,6 +232,18 @@ const ConversationPage: FC<ConversationPageProps> = () => {
       )}
       <div className="flex p-4 gap-2 bg-slate-800 z-10">
         <input
+          type="file"
+          id="file-input"
+          style={{ display: "none" }}
+          onChange={handleFileChange}
+        />
+        <button
+          className="bg-slate-700 hover:bg-slate-600 text-white font-bold py-2 px-4 rounded"
+          onClick={() => document.getElementById("file-input")?.click()}
+        >
+          <RiAttachment2 size={24} />
+        </button>
+        <input
           type="text"
           className="w-full p-4 bg-slate-700 rounded text-white"
           placeholder="Type a message..."
@@ -206,10 +252,22 @@ const ConversationPage: FC<ConversationPageProps> = () => {
         />
         <button
           onClick={handleSendMessage}
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+          className="bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-4 rounded"
         >
-          Send
+          <RiSendPlaneFill size={24} />
         </button>
+      </div>
+      <div className="flex p-4 gap-2 bg-slate-800 z-10">
+        {attachment && (
+          <div className="flex p-4 gap-2 bg-slate-800 z-10">
+            <div className="relative flex items-center">
+              <span className="mr-2">{attachment.name}</span>
+              <button onClick={handleRemoveAttachment} className="text-red-500">
+                &times;
+              </button>
+            </div>
+          </div>
+        )}
       </div>
       {showInfoModal && (
         <ViewGroupChatRoomModal

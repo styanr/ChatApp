@@ -8,14 +8,34 @@ namespace ChatApp.Controllers;
 public class FilesController : ControllerBase
 {
     private readonly IProfilePictureService _profilePictureService;
+    private readonly IFileService _fileService;
 
-    public FilesController(IProfilePictureService profilePictureService)
+    public FilesController(IProfilePictureService profilePictureService, IFileService fileService)
     {
         _profilePictureService = profilePictureService;
+        _fileService = fileService;
+    }
+
+    [HttpPost]
+    public async Task<ActionResult<Guid>> UploadFileAsync(IFormFile file, CancellationToken cancellationToken)
+    {
+        await using var stream = file.OpenReadStream();
+
+        var id = await _fileService.UploadAsync(stream, file.ContentType, cancellationToken);
+
+        return Ok(id);
+    }
+
+    [HttpGet("{id}")]
+    public async Task<FileStreamResult> DownloadFileAsync(Guid id, CancellationToken cancellationToken)
+    {
+        var response = await _fileService.DownloadAsync(id, cancellationToken);
+
+        return File(response.Stream, response.ContentType);
     }
 
     [HttpPost("profile-pictures")]
-    public async Task<ActionResult<Guid>> UploadAsync(IFormFile file, CancellationToken cancellationToken)
+    public async Task<ActionResult<Guid>> UploadProfilePictureAsync(IFormFile file, CancellationToken cancellationToken)
     {
         await using var stream = file.OpenReadStream();
 
@@ -25,7 +45,7 @@ public class FilesController : ControllerBase
     }
 
     [HttpGet("profile-pictures/{id}")]
-    public async Task<FileStreamResult> DownloadAsync(Guid id, CancellationToken cancellationToken)
+    public async Task<FileStreamResult> DownloadProfilePictureAsync(Guid id, CancellationToken cancellationToken)
     {
         var response = await _profilePictureService.DownloadProfilePictureAsync(id, cancellationToken);
 

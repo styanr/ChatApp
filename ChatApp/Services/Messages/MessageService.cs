@@ -1,4 +1,5 @@
 ﻿using ChatApp.Entities;
+using ChatApp.Mapping;
 using ChatApp.Models;
 using ChatApp.Models.Messages;
 using ChatApp.Repositories.ChatRooms;
@@ -28,7 +29,7 @@ public class MessageService : IMessageService
             .Take(request.PageSize)
             .ToList();
         
-        var orderedMessages = messages.OrderBy(m => m.CreatedAt).Select(MapMessageToResponse).ToList();
+        var orderedMessages = messages.OrderBy(m => m.CreatedAt).Select(m => m.ToMessageResponse()).ToList();
         
         return orderedMessages;
     }
@@ -42,12 +43,13 @@ public class MessageService : IMessageService
         {
             ChatRoomId = chatRoomId,
             AuthorId = userId,
-            Content = message.Content
+            Content = message.Content,
+            AttachmentId = message.AttachmentId
         };
         
         await _messageRepository.AddAsync(newMessage);
         
-        return MapMessageToResponse(newMessage);
+        return newMessage.ToMessageResponse();
     }
 
     public async Task<MessageResponse> EditMessageAsync(Guid messageId, Guid userId, MessageUpdate message)
@@ -68,8 +70,8 @@ public class MessageService : IMessageService
         existingMessage.EditedAt = DateTime.UtcNow;
         
         await _messageRepository.UpdateAsync(existingMessage);
-        
-        return MapMessageToResponse(existingMessage);
+
+        return existingMessage.ToMessageResponse();
     }
 
     public async Task<(Guid, Guid)> DeleteMessageAsync(Guid messageId, Guid userId)
@@ -107,14 +109,5 @@ public class MessageService : IMessageService
         }
 
         return chatRoom;
-    }
-    
-    private MessageResponse MapMessageToResponse(Message message)
-    {
-        if (message.IsDeleted)
-        {
-            return new MessageResponse(message.Id, message.ChatRoomId, message.AuthorId, "This message has been deleted.", message.CreatedAt, message.EditedAt, message.IsDeleted);
-        }
-        return new MessageResponse(message.Id, message.ChatRoomId, message.AuthorId, message.Content, message.CreatedAt, message.EditedAt, message.IsDeleted);
     }
 }

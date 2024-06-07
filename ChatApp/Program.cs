@@ -56,6 +56,7 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IContactService, ContactService>();
 
 builder.Services.AddSingleton<IProfilePictureService, ProfilePictureService>();
+builder.Services.AddSingleton<IFileService, FileService>();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(x =>
 {

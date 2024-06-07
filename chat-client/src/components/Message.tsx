@@ -1,10 +1,76 @@
-import { FC, useState, useRef } from "react"
+import { FC, useState, useRef, useEffect } from "react"
 import { useGetUserByIdQuery } from "../features/users/usersApiSlice"
 import { convertUTCtoLocal } from "../utils/converters"
 
 import { useLongPress } from "@uidotdev/usehooks"
+import useFiles from "../app/hooks/useFiles"
+
 import { ControlledMenu, MenuItem, MenuButton } from "@szhsin/react-menu"
 import { RiDeleteBin6Fill, RiEdit2Fill } from "react-icons/ri"
+
+interface AttachmentProps {
+  attachmentId: string
+}
+
+const Attachment: FC<AttachmentProps> = ({ attachmentId }) => {
+  const { getFile } = useFiles()
+  const [file, setFile] = useState<{ url: string; type: string }>({
+    url: "",
+    type: "",
+  })
+  const [isFullScreen, setIsFullScreen] = useState(false)
+
+  useEffect(() => {
+    if (attachmentId) {
+      getFile(attachmentId).then(file => {
+        setFile({ url: URL.createObjectURL(file), type: file.type })
+      })
+    }
+  }, [attachmentId])
+
+  const toggleFullScreen = () => {
+    setIsFullScreen(!isFullScreen)
+  }
+
+  return (
+    <>
+      <div className="flex items-center gap-2 pb-3">
+        {file.type.startsWith("image/") && (
+          <img
+            src={file.url}
+            alt="Attachment"
+            className="h-auto rounded-md shadow-md cursor-pointer md:max-h-96 md:max-w-96 object-cover max-h-48 max-w-48"
+            onClick={toggleFullScreen}
+          />
+        )}
+        {file.type.startsWith("video/") && (
+          <video controls className="max-w-full h-auto rounded-md shadow-md">
+            <source src={file.url} type={file.type} />
+            Your browser does not support the video tag.
+          </video>
+        )}
+        {!file.type.startsWith("image/") && !file.type.startsWith("video/") && (
+          <a href={file.url} download className="text-blue-500 underline">
+            Download Attachment
+          </a>
+        )}
+      </div>
+
+      {isFullScreen && file.type.startsWith("image/") && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+          onClick={toggleFullScreen}
+        >
+          <img
+            src={file.url}
+            alt="Attachment"
+            className="max-w-full max-h-full"
+          />
+        </div>
+      )}
+    </>
+  )
+}
 
 interface MessageProps {
   message: any
@@ -122,7 +188,12 @@ const Message: FC<MessageProps> = ({
                   <span className="italic">This message was deleted</span>
                 </>
               ) : (
-                message.content
+                <>
+                  {message.attachmentId && (
+                    <Attachment attachmentId={message.attachmentId} />
+                  )}
+                  {message.content}
+                </>
               )}
             </div>
             {message.editedAt ? (

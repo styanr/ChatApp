@@ -17,6 +17,7 @@ import { ChatRoomDetails } from "../features/chatrooms/chatRoomApiSlice"
 import { Link } from "react-router-dom"
 
 import { RiEdit2Fill, RiPencilFill } from "react-icons/ri"
+import ImageUpload from "./ImageUpload"
 
 interface ViewGroupChatModalProps {
   chatRoom: ChatRoomDetails
@@ -113,6 +114,10 @@ const EditGroupChatModal: FC<ViewGroupChatModalProps> = ({
     description: chatRoom.description || "",
   })
 
+  const handleImageUpload = async (imageId: string) => {
+    setGroupChat({ ...groupChat, pictureId: imageId })
+  }
+
   const onSave = () => {
     updateGroupChatRoom(groupChat).unwrap()
     onClose()
@@ -121,6 +126,13 @@ const EditGroupChatModal: FC<ViewGroupChatModalProps> = ({
   return (
     <div>
       <div>
+        <div className="flex justify-center">
+          <ImageUpload
+            profilePictureId={groupChat.pictureId}
+            onImageUpload={handleImageUpload}
+          />
+        </div>
+
         <label htmlFor="name" className="block text-white">
           Name
         </label>
@@ -140,19 +152,6 @@ const EditGroupChatModal: FC<ViewGroupChatModalProps> = ({
           value={groupChat.description}
           onChange={e =>
             setGroupChat({ ...groupChat, description: e.target.value })
-          }
-          className="bg-slate-700 text-white w-full p-2 rounded-lg mt-1"
-        />
-
-        <label htmlFor="picture" className="block text-white mt-4">
-          Picture URL
-        </label>
-        <input
-          type="text"
-          id="picture"
-          value={groupChat.pictureId}
-          onChange={e =>
-            setGroupChat({ ...groupChat, pictureId: e.target.value })
           }
           className="bg-slate-700 text-white w-full p-2 rounded-lg mt-1"
         />

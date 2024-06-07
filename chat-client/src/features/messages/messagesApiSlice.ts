@@ -10,6 +10,7 @@ interface Message {
   chatRoomId: string
   authorId: string
   content: string
+  attachmentId?: string
   createdAt: string
   editedAt: string
   isDeleted: boolean
@@ -18,6 +19,7 @@ interface Message {
 interface MessageCreate {
   chatRoomId: string
   content: string
+  attachmentId: string | null
 }
 
 interface MessageUpdate {
@@ -43,6 +45,7 @@ export const messagesApiSlice = apiSlice.injectEndpoints({
 
         return await connection.invoke("SendMessage", message.chatRoomId, {
           content: message.content,
+          attachmentId: message.attachmentId,
         })
       },
     }),

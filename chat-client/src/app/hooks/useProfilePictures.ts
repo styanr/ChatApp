@@ -1,7 +1,7 @@
 import axios, { AxiosError } from "axios"
 import { useState } from "react"
 
-const useFiles = () => {
+const useProfilePictures = () => {
   const [isUploading, setIsUploading] = useState(false)
   const [uploadError, setUploadError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
@@ -19,7 +19,7 @@ const useFiles = () => {
     }
   }
 
-  const uploadFile = async (file: File) => {
+  const uploadProfilePicture = async (file: File) => {
     setIsUploading(true)
     setUploadError(null)
 
@@ -27,11 +27,15 @@ const useFiles = () => {
       const formData = new FormData()
       formData.append("file", file)
 
-      const response = await axios.post("/api/files", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
+      const response = await axios.post(
+        "/api/files/profile-pictures",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
         },
-      })
+      )
 
       return response.data
     } catch (error) {
@@ -41,12 +45,12 @@ const useFiles = () => {
     }
   }
 
-  const getFile = async (id: string) => {
+  const getProfilePicture = async (id: string) => {
     setIsLoading(true)
     setError(null)
 
     try {
-      const response = await axios.get(`/api/files/${id}`, {
+      const response = await axios.get(`/api/files/profile-pictures/${id}`, {
         responseType: "blob",
       })
 
@@ -59,8 +63,8 @@ const useFiles = () => {
   }
 
   return {
-    uploadFile,
-    getFile,
+    uploadProfilePicture,
+    getProfilePicture,
     isUploading,
     uploadError,
     isLoading,
@@ -68,4 +72,4 @@ const useFiles = () => {
   }
 }
 
-export default useFiles
+export default useProfilePictures

@@ -1,6 +1,6 @@
 import React, { FC, useState, useEffect } from "react"
 
-import useFiles from "../app/hooks/useFiles"
+import useProfilePictures from "../app/hooks/useProfilePictures"
 
 interface ProfileImageProps {
   id: string | undefined
@@ -15,7 +15,7 @@ const ProfileImage: FC<ProfileImageProps> = ({ id, size }) => {
     e.currentTarget.src = imageFallback
   }
 
-  const { getProfilePicture, error, isLoading } = useFiles()
+  const { getProfilePicture, error, isLoading } = useProfilePictures()
 
   const [src, setSrc] = useState<string | null>(null)
 
