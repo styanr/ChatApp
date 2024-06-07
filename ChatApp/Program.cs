@@ -56,6 +56,7 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IContactService, ContactService>();
 
 builder.Services.AddTransient<FileRestrictionsManager>();
+builder.Services.AddTransient<FileProcessor>();
 builder.Services.AddSingleton<IProfilePictureService, ProfilePictureService>();
 builder.Services.AddSingleton<IFileService, FileService>();
 

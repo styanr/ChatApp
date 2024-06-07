@@ -48,18 +48,17 @@ const ContactDisplay: FC<ContactDisplayProps> = ({
             }
             menuClassName="box-border z-50 text-sm bg-gray-800 py-3 border rounded-md shadow-lg select-none focus:outline-none min-w-[9rem] border-none w-48"
           >
-            {isCurrentUser ||
-              (data?.isContact && (
-                <MenuItem
-                  className="px-3 py-3 focus:bg-gray-700"
-                  onClick={onEdit}
-                >
-                  <div className="flex items-center flex-row">
-                    <RiEdit2Fill className="w-6 h-6 pr-2" />
-                    Edit
-                  </div>
-                </MenuItem>
-              ))}
+            {(isCurrentUser || data?.isContact) && (
+              <MenuItem
+                className="px-3 py-3 focus:bg-gray-700"
+                onClick={onEdit}
+              >
+                <div className="flex items-center flex-row">
+                  <RiEdit2Fill className="w-6 h-6 pr-2" />
+                  Edit
+                </div>
+              </MenuItem>
+            )}
             {isCurrentUser ? (
               <MenuItem
                 className="px-3 py-3 focus:bg-gray-700"

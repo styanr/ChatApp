@@ -6,43 +6,35 @@ namespace ChatApp.Services.Blobs;
 
 public class ProfilePictureService : IProfilePictureService
 {
+    private readonly FileProcessor _fileProcessor;
     private readonly IBlobService _blobService;
     private readonly FileRestrictionsManager _fileRestrictionsManager;
 
-    public ProfilePictureService([FromKeyedServices("images")] IBlobService blobService, FileRestrictionsManager fileRestrictionsManager)
+    public ProfilePictureService([FromKeyedServices("images")] IBlobService blobService,
+        FileRestrictionsManager fileRestrictionsManager, FileProcessor fileProcessor)
     {
+        _fileProcessor = fileProcessor;
         _blobService = blobService;
         _fileRestrictionsManager = fileRestrictionsManager;
     }
-    
+
     public async Task<Guid> UploadProfilePictureAsync(IFormFile file, CancellationToken cancellationToken = default)
     {
         if (!_fileRestrictionsManager.IsContentTypeAllowed(file.ContentType, isImage: true))
         {
             throw new InvalidFileException("Invalid file type.");
         }
-        
+
         if (!_fileRestrictionsManager.IsFileSizeAllowed(file.Length))
         {
             throw new InvalidFileException("File size is too large.");
         }
-        
+
         var contentType = file.ContentType;
-        await using var stream = file.OpenReadStream();
 
-        using MagickImage image = new MagickImage(stream);
-        
-        var side = Math.Min(image.Width, image.Height);
-        image.Crop(side, side, Gravity.Center);
-        
-        image.Format = MagickFormat.Jpeg;
-        image.Quality = 80;
-        
-        using var memoryStream = new MemoryStream();
-        await image.WriteAsync(memoryStream);
-        memoryStream.Position = 0;
+        await using var processedImage = _fileProcessor.ProcessProfilePicture(file.OpenReadStream());
 
-        return await _blobService.UploadAsync(memoryStream, contentType, "images", cancellationToken);
+        return await _blobService.UploadAsync(processedImage, contentType, "images", cancellationToken);
     }
 
     public async Task<FileResponse> DownloadProfilePictureAsync(Guid id, CancellationToken cancellationToken = default)

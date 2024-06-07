@@ -44,7 +44,10 @@ const Attachment: FC<AttachmentProps> = ({ attachmentId }) => {
           />
         )}
         {file.type.startsWith("video/") && (
-          <video controls className="max-w-full h-auto rounded-md shadow-md">
+          <video
+            controls
+            className="h-auto rounded-md shadow-md cursor-pointer md:max-h-96 md:max-w-96 object-cover max-h-48 max-w-48"
+          >
             <source src={file.url} type={file.type} />
             Your browser does not support the video tag.
           </video>
