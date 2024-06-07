@@ -21,7 +21,7 @@ public class FilesController : ControllerBase
     {
         await using var stream = file.OpenReadStream();
 
-        var id = await _fileService.UploadAsync(stream, file.ContentType, cancellationToken);
+        var id = await _fileService.UploadAsync(file, cancellationToken);
 
         return Ok(id);
     }
@@ -39,7 +39,7 @@ public class FilesController : ControllerBase
     {
         await using var stream = file.OpenReadStream();
 
-        var id = await _profilePictureService.UploadProfilePictureAsync(stream, file.ContentType, cancellationToken);
+        var id = await _profilePictureService.UploadProfilePictureAsync(file, cancellationToken);
 
         return Ok(id);
     }
