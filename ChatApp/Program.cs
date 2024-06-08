@@ -27,17 +27,25 @@ builder.Services.AddDbContext<ChatDbContext>(options =>
 });
 
 // TODO: Store JWT configuration securely
-var jwtSettings = configuration.GetSection("JwtSettings").Get<JwtSettings>();
+var jwtOptions = configuration.GetSection(nameof(JwtOptions)).Get<JwtOptions>();
 
-if (jwtSettings is null)
+if (jwtOptions is null)
 {
-    throw new InvalidOperationException("JwtSettings configuration is missing");
+    throw new InvalidOperationException("JwtOptions configuration is missing");
 }
 
+builder.Services.AddSingleton(jwtOptions);
+
+var blobOptions = configuration.GetSection(nameof(BlobOptions)).Get<BlobOptions>();
+
+if (blobOptions is null)
+{
+    throw new InvalidOperationException("BlobOptions configuration is missing");
+}
+
+builder.Services.AddSingleton(blobOptions);
+
 builder.Services.AddHttpContextAccessor();
-
-builder.Services.AddSingleton(jwtSettings);
-
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IMessageRepository, MessageRepository>();
 builder.Services.AddScoped<IChatRoomRepository, ChatRoomRepository>();
@@ -79,9 +87,9 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
     };
     x.TokenValidationParameters = new TokenValidationParameters()
     {
-        ValidIssuer = jwtSettings.Issuer,
-        ValidAudience = jwtSettings.Audience,
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.Key)),
+        ValidIssuer = jwtOptions.Issuer,
+        ValidAudience = jwtOptions.Audience,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions.Key)),
         ValidateIssuer = true,
         ValidateAudience = true,
         ValidateLifetime = true,

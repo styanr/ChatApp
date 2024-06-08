@@ -1,6 +1,6 @@
 ﻿namespace ChatApp.Services.Auth;
 
-public record JwtSettings(
+public record JwtOptions(
     string Key,
     string Issuer,
     string Audience,

@@ -10,24 +10,24 @@ namespace ChatApp.Services.Auth;
 
 public class JwtUtil
 {
-    private readonly JwtSettings _jwtSettings;
+    private readonly JwtOptions _jwtOptions;
 
-    public JwtUtil(JwtSettings jwtSettings)
+    public JwtUtil(JwtOptions jwtOptions)
     {
-        _jwtSettings = jwtSettings;
+        _jwtOptions = jwtOptions;
     }
     
     public (string accessToken, string refreshToken, DateTime refreshTokenExpiry) GenerateTokens(User user)
     {
         var tokenHandler = new JwtSecurityTokenHandler();
-        var key = Encoding.ASCII.GetBytes(_jwtSettings.Key);
+        var key = Encoding.ASCII.GetBytes(_jwtOptions.Key);
         
         var tokenDescriptor = new SecurityTokenDescriptor
         {
             Subject = new ClaimsIdentity(new[] { new Claim(ClaimTypes.Email, user.Email), new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()) }),
-            Expires = DateTime.UtcNow.AddMinutes(_jwtSettings.DurationInMinutes),
-            Issuer = _jwtSettings.Issuer,
-            Audience = _jwtSettings.Audience,
+            Expires = DateTime.UtcNow.AddMinutes(_jwtOptions.DurationInMinutes),
+            Issuer = _jwtOptions.Issuer,
+            Audience = _jwtOptions.Audience,
             SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
         };
         
@@ -35,7 +35,7 @@ public class JwtUtil
         
         var refreshToken = GenerateRefreshToken();
         
-        return (tokenHandler.WriteToken(token), refreshToken, DateTime.UtcNow.AddDays(_jwtSettings.RefreshTokenDurationInDays));
+        return (tokenHandler.WriteToken(token), refreshToken, DateTime.UtcNow.AddDays(_jwtOptions.RefreshTokenDurationInDays));
     }
 
     private string GenerateRefreshToken()
@@ -49,16 +49,16 @@ public class JwtUtil
     public ClaimsPrincipal GetPrincipalFromToken(string token)
     {
         var tokenHandler = new JwtSecurityTokenHandler();
-        var key = Encoding.ASCII.GetBytes(_jwtSettings.Key);
+        var key = Encoding.ASCII.GetBytes(_jwtOptions.Key);
         
         var tokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuerSigningKey = true,
             IssuerSigningKey = new SymmetricSecurityKey(key),
             ValidateIssuer = true,
-            ValidIssuer = _jwtSettings.Issuer,
+            ValidIssuer = _jwtOptions.Issuer,
             ValidateAudience = true,
-            ValidAudience = _jwtSettings.Audience,
+            ValidAudience = _jwtOptions.Audience,
             ValidateLifetime = false
         };
         
