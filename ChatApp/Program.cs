@@ -22,10 +22,15 @@ using Microsoft.Extensions.Azure;
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
 
-builder.Services.AddDbContext<ChatDbContext>(options =>
+var sqlConnection = configuration["ConnectionStrings:SqlDb"];
+Console.WriteLine(sqlConnection);
+
+if (string.IsNullOrEmpty(sqlConnection))
 {
-    options.UseSqlServer(configuration.GetConnectionString("SqlServerConnection"));
-});
+    throw new InvalidOperationException("SqlDb connection string is missing");
+}
+
+builder.Services.AddSqlServer<ChatDbContext>(sqlConnection);
 
 // TODO: Store JWT configuration securely
 var jwtOptions = configuration.GetSection(nameof(JwtOptions)).Get<JwtOptions>();
@@ -105,6 +110,7 @@ builder.Services.AddControllers();
 builder.Services.AddSignalR();
 
 builder.Services.AddEndpointsApiExplorer();
+
 builder.Services.AddSwaggerGen(options =>
 {
     options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
@@ -157,9 +163,10 @@ app.UseExceptionHandler(_ => { });
 
 app.UseCors();
 
+app.UseSwagger();
+
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
     app.UseSwaggerUI();
 }
 
