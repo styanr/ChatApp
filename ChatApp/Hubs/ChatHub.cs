@@ -84,7 +84,7 @@ public class ChatHub : Hub
         
         if (userId is null)
         {
-            throw new UserNotFoundException("User not found");
+            throw new UserIdNotFound();
         }
         
         return Guid.Parse(userId);

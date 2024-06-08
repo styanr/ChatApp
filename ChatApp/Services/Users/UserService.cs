@@ -33,7 +33,7 @@ namespace ChatApp.Services.Users
             var user = await _userRepository.GetByIdAsync(id);
             if (user == null)
             {
-                throw new UserNotFoundException("User not found");
+                throw new UserNotFoundException(id);
             }
 
             var userResponse = await MapUserToUserResponse(user, userId);
@@ -45,7 +45,7 @@ namespace ChatApp.Services.Users
             var user = await _userRepository.GetByIdAsync(id);
             if (user == null)
             {
-                throw new UserNotFoundException("User not found");
+                throw new UserNotFoundException(id);
             }
 
             var userResponse = MapUserToUserResponse(user);
@@ -58,7 +58,7 @@ namespace ChatApp.Services.Users
             
             if (user == null)
             {
-                throw new UserNotFoundException("User not found");
+                throw new UserNotFoundException(id);
             }
             
             user.DisplayName = request.DisplayName;

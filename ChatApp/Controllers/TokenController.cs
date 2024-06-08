@@ -15,26 +15,20 @@ public class TokenController : ControllerBase
     {
         _authService = authService;
     }
+
     [HttpPost]
     [Route("refresh")]
     public async Task<ActionResult<TokenResponse>> Refresh()
     {
-        var header = Request.Headers["Authorization"]; 
-        
+        var header = Request.Headers["Authorization"];
+
         if (header.Count == 0)
         {
             return Unauthorized(new ErrorResponse("No token provided"));
         }
-        
+
         var token = Request.Headers["Authorization"].ToString().Split(" ")[1];
         var request = new TokenRequest(token);
-        try
-        {
-            return await _authService.RefreshTokenAsync(request);
-        }
-        catch (UnauthorizedAccessException e)
-        {
-            return Unauthorized(new ErrorResponse(e.Message));
-        }
+        return await _authService.RefreshTokenAsync(request);
     }
 }

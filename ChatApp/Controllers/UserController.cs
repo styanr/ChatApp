@@ -19,52 +19,37 @@ public class UserController : ControllerBase
     {
         _userService = userService;
     }
-    
+
     [HttpGet]
     public async Task<ActionResult<UserListResponse>> GetUsers([FromQuery] UserSearchRequest request)
     {
         var userId = User.GetUserId();
-        
+
         var users = await _userService.GetUsersForUserAsync(request, userId);
         return users;
     }
-    
+
     [HttpGet("{id}")]
     public async Task<ActionResult<UserResponse>> GetUser(Guid id)
     {
         var userId = User.GetUserId();
-
-        try
-        {
-            return await _userService.GetUserForUserAsync(id, userId);
-        }
-        catch (UserNotFoundException)
-        {
-            return NotFound();
-        }
+        
+        return await _userService.GetUserForUserAsync(id, userId);
     }
-    
+
     [HttpGet("current")]
     public async Task<ActionResult<UserResponse>> GetCurrentUser()
     {
         var userId = User.GetUserId();
-        
+
         return await _userService.GetUser(userId);
     }
-    
+
     [HttpPut("current")]
     public async Task<ActionResult<UserResponse>> UpdateUser([FromBody] UserUpdate request)
     {
         var userId = User.GetUserId();
-        
-        try
-        {
-            return await _userService.UpdateUserAsync(userId, request);
-        }
-        catch (UserNotFoundException)
-        {
-            return NotFound();
-        }
+
+        return await _userService.UpdateUserAsync(userId, request);
     }
-    
 }

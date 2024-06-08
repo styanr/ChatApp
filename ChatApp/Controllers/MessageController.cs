@@ -21,19 +21,13 @@ public class MessageController : ControllerBase
     {
         _messageService = messageService;
     }
+
     [HttpGet("{chatRoomId}")]
-    
-    public async Task<ActionResult<IEnumerable<MessageResponse>>> GetMessages(Guid chatRoomId, [FromQuery] PagedRequest request)
+    public async Task<ActionResult<IEnumerable<MessageResponse>>> GetMessages(Guid chatRoomId,
+        [FromQuery] PagedRequest request)
     {
-        try
-        {
-            var userId = User.GetUserId();
-            var messages = await _messageService.GetMessagesAsync(chatRoomId, userId, request);
-            return Ok(messages);
-        }
-        catch (UserNotFoundException e)
-        {
-            return Unauthorized(new ErrorResponse(e.Message));
-        }
+        var userId = User.GetUserId();
+        var messages = await _messageService.GetMessagesAsync(chatRoomId, userId, request);
+        return Ok(messages);
     }
 }

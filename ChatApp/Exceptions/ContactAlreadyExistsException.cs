@@ -1,3 +1,3 @@
 ﻿namespace ChatApp.Exceptions;
 
-public class ContactAlreadyExistsException(string message) : Exception(message);
+public class ContactAlreadyExistsException() : Exception("Contact already exists");

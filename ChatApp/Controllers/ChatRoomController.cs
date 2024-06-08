@@ -40,114 +40,55 @@ public class ChatRoomController : ControllerBase
             return Unauthorized(new ErrorResponse(e.Message));
         }
     }
-    
+
     [HttpGet("{chatId}")]
     public async Task<ActionResult<ChatRoomDetails>> GetChat(Guid chatId)
     {
-        try
-        {
-            var userId = User.GetUserId();
-            var chatRoomDetails = await _chatRoomService.GetChatAsync(userId, chatId);
-            return chatRoomDetails;
-        }
-        catch (ChatRoomNotFoundException e)
-        {
-            return NotFound(new ErrorResponse(e.Message));
-        }
-        catch (UserNotFoundException e)
-        {
-            return NotFound(new ErrorResponse(e.Message));
-        }
+        var userId = User.GetUserId();
+        var chatRoomDetails = await _chatRoomService.GetChatAsync(userId, chatId);
+        return chatRoomDetails;
     }
-    
+
     [HttpPost("direct")]
-    public async Task<ActionResult<ChatRoomSummary>> CreateDirectChat([FromBody] DirectChatRoomCreate groupChatRoomCreate)
+    public async Task<ActionResult<ChatRoomSummary>> CreateDirectChat(
+        [FromBody] DirectChatRoomCreate groupChatRoomCreate)
     {
-        try
-        {
-            var userId = User.GetUserId();
-            var chatRoomSummary = await _chatRoomService.CreateDirectChatAsync(userId, groupChatRoomCreate.OtherUserId);
-            return CreatedAtAction(nameof(GetAll), new { id = chatRoomSummary.Id }, chatRoomSummary);
-        }
-        catch (UserNotFoundException e)
-        {
-            return Unauthorized(new ErrorResponse(e.Message));
-        }
-        catch (ArgumentException e)
-        {
-            return BadRequest(new ErrorResponse(e.Message));
-        }
+        var userId = User.GetUserId();
+        var chatRoomSummary = await _chatRoomService.CreateDirectChatAsync(userId, groupChatRoomCreate.OtherUserId);
+        return CreatedAtAction(nameof(GetAll), new { id = chatRoomSummary.Id }, chatRoomSummary);
     }
 
     [HttpPost("group")]
     public async Task<ActionResult<ChatRoomSummary>> CreateGroupChat([FromBody] GroupChatRoomCreate groupChatRoomCreate)
     {
-        try
-        {
-            var userId = User.GetUserId();
-            var chatRoomSummary = await _chatRoomService.CreateGroupChatAsync(userId, groupChatRoomCreate);
-            return CreatedAtAction(nameof(GetAll), new { id = chatRoomSummary.Id }, chatRoomSummary);
-        }
-        catch (UserNotFoundException e)
-        {
-            return Unauthorized(new ErrorResponse(e.Message));
-        }
+        var userId = User.GetUserId();
+        var chatRoomSummary = await _chatRoomService.CreateGroupChatAsync(userId, groupChatRoomCreate);
+        return CreatedAtAction(nameof(GetAll), new { id = chatRoomSummary.Id }, chatRoomSummary);
     }
 
     [HttpPost("{chatId}/users")]
-    public async Task<ActionResult<ChatRoomSummary>> AddUsersToChat(Guid chatId, [FromBody] ChatRoomAddUsers chatRoomAddUsers)
+    public async Task<ActionResult<ChatRoomSummary>> AddUsersToChat(Guid chatId,
+        [FromBody] ChatRoomAddUsers chatRoomAddUsers)
     {
-        try
-        {
-            var userId = User.GetUserId();
-            var chatRoomSummary = await _chatRoomService.AddUsersToChatAsync(userId, chatId, chatRoomAddUsers);
-            return Ok(chatRoomSummary);
-        }
-        catch (ChatRoomNotFoundException ex)
-        {
-            return NotFound(ex.Message);
-        }
-        catch (UserNotFoundException ex)
-        {
-            return NotFound(ex.Message);
-        }
-        catch (ArgumentException ex)
-        {
-            return BadRequest(ex.Message);
-        }
+        var userId = User.GetUserId();
+        var chatRoomSummary = await _chatRoomService.AddUsersToChatAsync(userId, chatId, chatRoomAddUsers);
+        return Ok(chatRoomSummary);
     }
 
     [HttpDelete("{chatId}/users/{deleteUserId}")]
     public async Task<ActionResult<ChatRoomSummary>> RemoveUserFromChat(Guid chatId, Guid deleteUserId)
     {
-        try
-        {
-            var userId = User.GetUserId();
-            var chatRoomSummary = await _chatRoomService.RemoveUserFromChatAsync(userId, chatId, deleteUserId);
-            return Ok(chatRoomSummary);
-        }
-        catch (ChatRoomNotFoundException e)
-        {
-            return NotFound(new ErrorResponse(e.Message));
-        }
-        catch (UserNotFoundException e)
-        {
-            return NotFound(new ErrorResponse(e.Message));
-        }
+        var userId = User.GetUserId();
+        var chatRoomSummary = await _chatRoomService.RemoveUserFromChatAsync(userId, chatId, deleteUserId);
+        return Ok(chatRoomSummary);
     }
 
     [HttpPut("{chatId}")]
-    public async Task<ActionResult<ChatRoomSummary>> UpdateGroupChat(Guid chatId, [FromBody] ChatRoomUpdate chatRoomUpdate)
+    public async Task<ActionResult<ChatRoomSummary>> UpdateGroupChat(Guid chatId,
+        [FromBody] ChatRoomUpdate chatRoomUpdate)
     {
-        try
-        {
-            var userId = User.GetUserId();
-            var chatRoomSummary = await _chatRoomService.UpdateGroupChatAsync(userId, chatId, chatRoomUpdate);
-            return Ok(chatRoomSummary);
-        }
-        catch (ChatRoomNotFoundException e)
-        {
-            return NotFound(new ErrorResponse(e.Message));
-        }
+        var userId = User.GetUserId();
+        var chatRoomSummary = await _chatRoomService.UpdateGroupChatAsync(userId, chatId, chatRoomUpdate);
+        return Ok(chatRoomSummary);
     }
 }

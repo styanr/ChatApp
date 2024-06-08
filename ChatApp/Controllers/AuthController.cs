@@ -15,24 +15,18 @@ public class AuthController : ControllerBase
     {
         _authService = authService;
     }
+
     [HttpPost]
     [Route("register")]
     public async Task<ActionResult<TokenResponse>> Register([FromBody] RegisterRequest request)
     {
         return await _authService.RegisterAsync(request);
     }
-    
+
     [HttpPost]
     [Route("login")]
     public async Task<ActionResult<TokenResponse>> Login([FromBody] LoginRequest request)
     {
-        try
-        {
-            return await _authService.LoginAsync(request);
-        }
-        catch (UnauthorizedAccessException e)
-        {
-            return Unauthorized(new ErrorResponse(e.Message));
-        }
+        return await _authService.LoginAsync(request);
     }
 }

@@ -40,21 +40,14 @@ public class ContactService : IContactService
         
         if (userContact is null)
         {
-            throw new UserNotFoundException("User not found");
-        }
-        
-        var existingContactUser = await _userRepository.GetByIdAsync(userContactAdd.ContactUserId);
-        
-        if (existingContactUser == null)
-        {
-            throw new UserNotFoundException("Contact user not found");
+            throw new UserNotFoundException(userContactAdd.ContactUserId);
         }
         
         var existingContact = await _contactRepository.GetByIdWithIncludesAsync(userId, userContactAdd.ContactUserId);
         
         if (existingContact is not null)
         {
-            throw new ContactAlreadyExistsException("Contact already exists");
+            throw new ContactAlreadyExistsException();
         }
         
         var contact = new Contact
@@ -75,7 +68,7 @@ public class ContactService : IContactService
         
         if (contact == null)
         {
-            throw new ContactNotFoundException("Contact not found");
+            throw new ContactNotFoundException(contactId);
         }
         
         if (contact.UserId != userId)
@@ -93,7 +86,7 @@ public class ContactService : IContactService
         
         if (contact == null)
         {
-            throw new ContactNotFoundException("Contact not found");
+            throw new ContactNotFoundException(contactId);
         }
         
         if (contact.UserId != userId)

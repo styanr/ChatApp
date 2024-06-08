@@ -42,12 +42,12 @@ namespace ChatApp.Services.ChatRooms
             var chatRoom = await _chatRoomRepository.GetChatRoomAsync(chatId);
             if (chatRoom is null)
             {
-                throw new ChatRoomNotFoundException("Chat room not found");
+                throw new ChatRoomNotFoundException(chatId);
             }
 
             if (chatRoom.Users.All(u => u.Id != userId))
             {
-                throw new UserNotFoundException("User not found in chat room");
+                throw new UnauthorizedAccessException();
             }
 
             return chatRoom.ToChatRoomDetails(userId);
@@ -60,7 +60,7 @@ namespace ChatApp.Services.ChatRooms
 
             if (user is null || otherUser is null)
             {
-                throw new UserNotFoundException("User not found");
+                throw new UserNotFoundException(userId);
             }
 
             if (user.Id == otherUser.Id)
@@ -75,7 +75,7 @@ namespace ChatApp.Services.ChatRooms
 
             if (await _chatRoomRepository.DirectChatRoomExists(userId, otherUserId))
             {
-                throw new ArgumentException("Direct chat room already exists");
+                throw new DirectChatRoomAlreadyExists();
             }
 
             var directChatRoom = new DirectChatRoom
@@ -113,7 +113,7 @@ namespace ChatApp.Services.ChatRooms
 
             if (user is null)
             {
-                throw new UserNotFoundException("User not found in chat room");
+                throw new UserNotFoundException(userId);
             }
 
             var users = await ValidateUsersExistenceAsync(chatRoomAddUsers.UserIds);
@@ -147,14 +147,14 @@ namespace ChatApp.Services.ChatRooms
 
             if (user is null)
             {
-                throw new UserNotFoundException("User not found in chat room");
+                throw new UserNotFoundException(userId);
             }
 
             var userToDelete = chatRoom.UserList.FirstOrDefault(u => u.Id == deleteUserId);
             
             if (userToDelete is null)
             {
-                throw new UserNotFoundException("User to delete not found in chat room");
+                throw new UserNotFoundException(deleteUserId);
             }
             
             if (userToDelete.Id == userId)
@@ -176,7 +176,7 @@ namespace ChatApp.Services.ChatRooms
             var user = chatRoom.UserList.FirstOrDefault(u => u.Id == userId);
             if (user is null)
             {
-                throw new UserNotFoundException("User not found in chat room");
+                throw new UserNotFoundException(userId);
             }
 
             chatRoom.Name = chatRoomUpdate.Name ?? chatRoom.Name;
@@ -193,7 +193,7 @@ namespace ChatApp.Services.ChatRooms
             var chatRoom = await _chatRoomRepository.GetByIdAsync(chatId);
             if (chatRoom is null)
             {
-                throw new ChatRoomNotFoundException("Chat room not found");
+                throw new ChatRoomNotFoundException(chatId);
             }
 
             return chatRoom.Users.Any(u => u.Id == userId);
@@ -205,12 +205,12 @@ namespace ChatApp.Services.ChatRooms
 
             if (chatRoom is null)
             {
-                throw new ChatRoomNotFoundException("Chat room not found");
+                throw new ChatRoomNotFoundException(chatId);
             }
 
             if (chatRoom.UserList.All(u => u.Id != userId))
             {
-                throw new UserNotFoundException("User not found in chat room");
+                throw new UserNotFoundException(userId);
             }
 
             return chatRoom;
@@ -223,7 +223,7 @@ namespace ChatApp.Services.ChatRooms
             var users = (await _userRepository.GetUsersByIdsAsync(userIdsList)).ToList();
             if (users.Count != userIdsList.Count)
             {
-                throw new UserNotFoundException("Some users not found");
+                throw new UserNotFoundException();
             }
 
             return users;
@@ -236,7 +236,7 @@ namespace ChatApp.Services.ChatRooms
 
             if (user is null || otherUser is null)
             {
-                throw new UserNotFoundException("User not found");
+                throw new UserNotFoundException();
             }
 
             var contact = await _contactRepository.GetByIdAsync(user.Id, otherUser.Id);

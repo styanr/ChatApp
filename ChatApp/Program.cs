@@ -1,5 +1,6 @@
 using System.Text;
 using ChatApp.Context;
+using ChatApp.ExceptionHandlers;
 using ChatApp.Hubs;
 using ChatApp.Managers;
 using ChatApp.Repositories.ChatRooms;
@@ -148,7 +149,11 @@ builder.Services.AddAzureClients(clientBuilder =>
     clientBuilder.AddQueueServiceClient(builder.Configuration["Azurite:queue"], preferMsi: true);
 });
 
+builder.Services.AddExceptionHandler<AppExceptionHandler>();
+
 var app = builder.Build();
+
+app.UseExceptionHandler(_ => { });
 
 app.UseCors();
 

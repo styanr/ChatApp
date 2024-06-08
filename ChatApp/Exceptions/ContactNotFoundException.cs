@@ -1,3 +1,3 @@
 ﻿namespace ChatApp.Exceptions;
 
-public class ContactNotFoundException(string message) : Exception(message);
+public class ContactNotFoundException(Guid id) : NotFoundException($"Contact with id {id} was not found");
