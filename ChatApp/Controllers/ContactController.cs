@@ -1,5 +1,6 @@
 ﻿using System.Security.Claims;
 using ChatApp.Exceptions;
+using ChatApp.Helpers;
 using ChatApp.Models;
 using ChatApp.Models.Users;
 using ChatApp.Services.Contacts;
@@ -23,7 +24,7 @@ public class ContactController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<UserListResponse>> GetContactsAsync([FromQuery] PagedRequest pagedRequest)
     {
-        var userId = GetUserId();
+        var userId = User.GetUserId();
         
         var userResponses = await _contactService.GetContactsAsync(userId, pagedRequest);
 
@@ -33,7 +34,7 @@ public class ContactController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<UserResponse>> AddContactAsync([FromBody] UserContactAdd userContactAdd)
     {
-        var userId = GetUserId();
+        var userId = User.GetUserId();
         try
         {
             var userResponse = await _contactService.AddContactAsync(userId, userContactAdd);
@@ -49,7 +50,7 @@ public class ContactController : ControllerBase
     [HttpDelete("{contactId}")]
     public async Task<IActionResult> RemoveContactAsync(Guid contactId)
     {
-        var userId = GetUserId();
+        var userId = User.GetUserId();
         try
         {
             await _contactService.RemoveContactAsync(userId, contactId);
@@ -68,7 +69,7 @@ public class ContactController : ControllerBase
     [HttpPut("{contactId}")]
     public async Task<ActionResult<UserResponse>> UpdateContactAsync(Guid contactId, [FromBody] UserContactUpdate userContactUpdate)
     {
-        var userId = GetUserId();
+        var userId = User.GetUserId();
         try
         {
             var userResponse = await _contactService.UpdateContactAsync(userId, contactId, userContactUpdate);
@@ -82,16 +83,5 @@ public class ContactController : ControllerBase
         {
             return NotFound();
         }
-    }
-    private Guid GetUserId()
-    {
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            
-        if (userId is null)
-        {
-            throw new UserNotFoundException("User not found");
-        }
-            
-        return Guid.Parse(userId);
     }
 }

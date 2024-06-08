@@ -1,5 +1,6 @@
 ﻿using ChatApp.Entities;
 using ChatApp.Exceptions;
+using ChatApp.Mapping;
 using ChatApp.Models;
 using ChatApp.Models.PagedResult;
 using ChatApp.Models.Users;
@@ -23,7 +24,7 @@ public class ContactService : IContactService
     {
         var contacts = await _contactRepository.GetAllWithIncludesAsync(pagedRequest.Page, pagedRequest.PageSize, c => c.UserId == userId);
         
-        var userResponses = MapPagedResultToUserListResponse(contacts);
+        var userResponses = contacts.ToUserListResponse();
         
         return userResponses;
     }
@@ -65,7 +66,7 @@ public class ContactService : IContactService
         
         await _contactRepository.AddAsync(contact);
         
-        return MapContactToUserResponse(contact);
+        return contact.ToUserResponse();
     }
 
     public async Task RemoveContactAsync(Guid userId, Guid contactId)
@@ -103,26 +104,8 @@ public class ContactService : IContactService
         contact.CustomName = userUpdateContact.DisplayName;
         
         await _contactRepository.UpdateAsync(contact);
-        
-        return MapContactToUserResponse(contact);
-    }
-    
-    // TODO: Move these methods to a mapper class
-    private UserResponse MapContactToUserResponse(Contact contact)
-    {
-        return new UserResponse(contact.ContactId, contact.ContactUser.Handle, contact.CustomName, contact.ContactUser.Bio, contact.ContactUser.ProfilePictureId, true);
-    }
 
-    private UserListResponse MapPagedResultToUserListResponse(PagedResult<Contact> pagedResult)
-    {
-        var userResponses = pagedResult.Results.Select(MapContactToUserResponse).ToList();
-
-        return new UserListResponse(
-            userResponses,
-            pagedResult.CurrentPage,
-            pagedResult.PageSize,
-            pagedResult.RowCount,
-            pagedResult.PageCount);
+        return contact.ToUserResponse();
     }
 
 }

@@ -1,5 +1,6 @@
 ﻿using System.Security.Claims;
 using ChatApp.Exceptions;
+using ChatApp.Helpers;
 using ChatApp.Models.Users;
 using ChatApp.Services.Users;
 using Microsoft.AspNetCore.Authorization;
@@ -22,7 +23,7 @@ public class UserController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<UserListResponse>> GetUsers([FromQuery] UserSearchRequest request)
     {
-        var userId = GetUserId();
+        var userId = User.GetUserId();
         
         var users = await _userService.GetUsersForUserAsync(request, userId);
         return users;
@@ -31,7 +32,7 @@ public class UserController : ControllerBase
     [HttpGet("{id}")]
     public async Task<ActionResult<UserResponse>> GetUser(Guid id)
     {
-        var userId = GetUserId();
+        var userId = User.GetUserId();
 
         try
         {
@@ -46,7 +47,7 @@ public class UserController : ControllerBase
     [HttpGet("current")]
     public async Task<ActionResult<UserResponse>> GetCurrentUser()
     {
-        var userId = GetUserId();
+        var userId = User.GetUserId();
         
         return await _userService.GetUser(userId);
     }
@@ -54,7 +55,7 @@ public class UserController : ControllerBase
     [HttpPut("current")]
     public async Task<ActionResult<UserResponse>> UpdateUser([FromBody] UserUpdate request)
     {
-        var userId = GetUserId();
+        var userId = User.GetUserId();
         
         try
         {
@@ -64,19 +65,6 @@ public class UserController : ControllerBase
         {
             return NotFound();
         }
-    }
-    
-    
-    private Guid GetUserId()
-    {
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            
-        if (userId is null)
-        {
-            throw new UserNotFoundException("User not found");
-        }
-            
-        return Guid.Parse(userId);
     }
     
 }

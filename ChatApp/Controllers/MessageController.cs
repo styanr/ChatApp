@@ -1,6 +1,7 @@
 ﻿using System.Security.Claims;
 using ChatApp.Entities;
 using ChatApp.Exceptions;
+using ChatApp.Helpers;
 using ChatApp.Models;
 using ChatApp.Models.Messages;
 using ChatApp.Services.Messages;
@@ -26,7 +27,7 @@ public class MessageController : ControllerBase
     {
         try
         {
-            var userId = GetUserId();
+            var userId = User.GetUserId();
             var messages = await _messageService.GetMessagesAsync(chatRoomId, userId, request);
             return Ok(messages);
         }
@@ -34,18 +35,5 @@ public class MessageController : ControllerBase
         {
             return Unauthorized(new ErrorResponse(e.Message));
         }
-    }
-    
-    // TODO: extract this to a service
-    private Guid GetUserId()
-    {
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            
-        if (userId is null)
-        {
-            throw new UserNotFoundException("User not found");
-        }
-            
-        return Guid.Parse(userId);
     }
 }

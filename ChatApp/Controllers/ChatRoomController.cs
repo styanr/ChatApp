@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using ChatApp.Exceptions;
+using ChatApp.Helpers;
 using ChatApp.Models;
 using ChatApp.Models.ChatRooms;
 using Microsoft.AspNetCore.Authorization;
@@ -30,7 +31,7 @@ public class ChatRoomController : ControllerBase
     {
         try
         {
-            var userId = GetUserId();
+            var userId = User.GetUserId();
             var chatRooms = await _chatRoomService.GetAllAsync(userId);
             return Ok(chatRooms);
         }
@@ -45,7 +46,7 @@ public class ChatRoomController : ControllerBase
     {
         try
         {
-            var userId = GetUserId();
+            var userId = User.GetUserId();
             var chatRoomDetails = await _chatRoomService.GetChatAsync(userId, chatId);
             return chatRoomDetails;
         }
@@ -64,7 +65,7 @@ public class ChatRoomController : ControllerBase
     {
         try
         {
-            var userId = GetUserId();
+            var userId = User.GetUserId();
             var chatRoomSummary = await _chatRoomService.CreateDirectChatAsync(userId, groupChatRoomCreate.OtherUserId);
             return CreatedAtAction(nameof(GetAll), new { id = chatRoomSummary.Id }, chatRoomSummary);
         }
@@ -83,7 +84,7 @@ public class ChatRoomController : ControllerBase
     {
         try
         {
-            var userId = GetUserId();
+            var userId = User.GetUserId();
             var chatRoomSummary = await _chatRoomService.CreateGroupChatAsync(userId, groupChatRoomCreate);
             return CreatedAtAction(nameof(GetAll), new { id = chatRoomSummary.Id }, chatRoomSummary);
         }
@@ -98,7 +99,7 @@ public class ChatRoomController : ControllerBase
     {
         try
         {
-            var userId = GetUserId();
+            var userId = User.GetUserId();
             var chatRoomSummary = await _chatRoomService.AddUsersToChatAsync(userId, chatId, chatRoomAddUsers);
             return Ok(chatRoomSummary);
         }
@@ -121,7 +122,7 @@ public class ChatRoomController : ControllerBase
     {
         try
         {
-            var userId = GetUserId();
+            var userId = User.GetUserId();
             var chatRoomSummary = await _chatRoomService.RemoveUserFromChatAsync(userId, chatId, deleteUserId);
             return Ok(chatRoomSummary);
         }
@@ -140,7 +141,7 @@ public class ChatRoomController : ControllerBase
     {
         try
         {
-            var userId = GetUserId();
+            var userId = User.GetUserId();
             var chatRoomSummary = await _chatRoomService.UpdateGroupChatAsync(userId, chatId, chatRoomUpdate);
             return Ok(chatRoomSummary);
         }
@@ -148,17 +149,5 @@ public class ChatRoomController : ControllerBase
         {
             return NotFound(new ErrorResponse(e.Message));
         }
-    }
-        
-    private Guid GetUserId()
-    {
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            
-        if (userId is null)
-        {
-            throw new UserNotFoundException("User not found");
-        }
-            
-        return Guid.Parse(userId);
     }
 }
