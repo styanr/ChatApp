@@ -9,8 +9,10 @@ import {
 import { setCredentials, logOut } from "../../features/auth/authSlice"
 import { RootState, AppDispatch } from "../store" // Assuming you have these types defined
 
+const apiUrl = import.meta.env.VITE_SERVER_URL as string
+
 const baseQuery = fetchBaseQuery({
-  baseUrl: "http://localhost:5117/api",
+  baseUrl: apiUrl + "/api",
   credentials: "include",
   prepareHeaders: (headers, { getState }) => {
     headers.set("content-type", "application/json")

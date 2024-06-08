@@ -96,7 +96,6 @@ namespace ChatApp.Services.ChatRooms
             var groupChatRoom = new GroupChatRoom
             {
                 Name = groupChatRoomCreate.Name ?? throw new ArgumentNullException(nameof(groupChatRoomCreate.Name)),
-                PictureId = groupChatRoomCreate.PictureId,
                 UserList = [user]
             };
 

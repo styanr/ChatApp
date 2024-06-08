@@ -16,7 +16,7 @@ import { persistStore } from "redux-persist"
 
 import axios from "axios"
 
-axios.defaults.baseURL = "http://localhost:5117"
+axios.defaults.baseURL = import.meta.env.VITE_SERVER_URL as string
 
 const container = document.getElementById("root")
 

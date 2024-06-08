@@ -24,7 +24,6 @@ interface ChatRoomDetails {
 
 interface GroupChatRoomCreateRequest {
   name: string
-  pictureId: string
 }
 
 interface GroupChatRoomUpdateRequest {

@@ -115,14 +115,6 @@ const CreateChatRoomModal: FC<CreateChatRoomModalProps> = ({
               onChange={handleInputChange}
               placeholder="Group Name"
             />
-            <input
-              type="text"
-              name="pictureUrl"
-              className="rounded-md px-3 py-2 w-full mb-4 bg-gray-900 text-white"
-              value={groupChatRoomRequest.pictureId}
-              onChange={handleInputChange}
-              placeholder="Picture URL"
-            />
           </>
         )}
         {newChatRoomType === "direct" && (
