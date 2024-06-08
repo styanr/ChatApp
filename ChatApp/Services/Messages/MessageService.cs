@@ -36,8 +36,10 @@ public class MessageService : IMessageService
 
     public async Task<MessageResponse> CreateMessageAsync(Guid chatRoomId, Guid userId, MessageCreate message)
     {
-        // TODO: need a better way to check if user is a member of chat room
-        var chatRoom = await GetChatRoomAsync(chatRoomId, userId);
+        if (!await _chatRoomRepository.IsUserInChatRoom(chatRoomId, userId))
+        {
+            throw new Exception($"User with ID {userId} is not a member of chat room with ID {chatRoomId}.");
+        }
         
         var newMessage = new Message
         {
