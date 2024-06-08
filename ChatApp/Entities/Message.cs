@@ -13,6 +13,7 @@ public class Message
     public Guid AuthorId { get; set; }
     public User Author { get; set; }
     
+    [MaxLength(1000)]
     public string Content { get; set; }
     public Guid? AttachmentId { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
