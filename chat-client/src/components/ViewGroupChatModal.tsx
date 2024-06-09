@@ -1,8 +1,11 @@
 import React, { FC, useState } from "react"
 
+import { useNavigate } from "react-router-dom"
+
 import {
   useUpdateGroupChatRoomMutation,
   useAddUsersToGroupChatRoomMutation,
+  useLeaveGroupChatRoomMutation,
   GroupChatRoomUpdateRequest,
   GroupChatRoomAddUsersRequest,
 } from "../features/chatrooms/chatRoomApiSlice"
@@ -30,6 +33,16 @@ const ViewGroupChatModal: FC<ViewGroupChatModalProps> = ({
 }) => {
   const [isEditing, setIsEditing] = useState(false)
   const [isAddingUsers, setIsAddingUsers] = useState(false)
+
+  const [leave] = useLeaveGroupChatRoomMutation()
+
+  const navigate = useNavigate()
+
+  const handleLeave = async () => {
+    await leave(chatRoom.id).unwrap()
+    onClose()
+    navigate("/messages")
+  }
 
   return (
     <div className="fixed inset-0 bg-slate-800 shadow-lg p-6 w-full z-20 flex items-center justify-center">
@@ -64,6 +77,12 @@ const ViewGroupChatModal: FC<ViewGroupChatModalProps> = ({
                   className="text-white hover:bg-slate-700 rounded-lg transition-colors duration-300 p-3"
                 >
                   <RiEdit2Fill className="w-5 h-5" />
+                </button>
+                <button
+                  onClick={handleLeave}
+                  className="bg-red-500 text-white rounded-lg py-2 px-3 mt-4 flex justify-center items-center hover:bg-red-600 transition-colors duration-300"
+                >
+                  Leave
                 </button>
               </div>
             </div>

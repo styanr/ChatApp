@@ -112,11 +112,31 @@ export const chatRoomApiSlice = apiSlice.injectEndpoints({
           throw new Error("SignalR connection not initialized")
         }
 
-        const chatRoom = await connection.invoke("CreateDirectChatRoom", body)
+        const chatRoom = await connection.invoke(
+          "CreateDirectChatRoom",
+          body.otherUserId,
+        )
 
         return { data: chatRoom }
       },
       invalidatesTags: ["ChatRoom"],
+    }),
+    leaveGroupChatRoom: builder.mutation<void, string>({
+      queryFn: async id => {
+        const connection = getConnection()
+
+        if (!connection) {
+          throw new Error("SignalR connection not initialized")
+        }
+
+        await connection.invoke("LeaveGroupChatRoom", id)
+
+        return { data: undefined }
+      },
+      invalidatesTags: (result, error, id) => [
+        { type: "ChatRoom", id },
+        { type: "ChatRoom", id: "LIST" },
+      ],
     }),
   }),
 })
@@ -128,6 +148,7 @@ export const {
   useUpdateGroupChatRoomMutation,
   useCreateDirectChatRoomMutation,
   useAddUsersToGroupChatRoomMutation,
+  useLeaveGroupChatRoomMutation,
 } = chatRoomApiSlice
 
 export type {

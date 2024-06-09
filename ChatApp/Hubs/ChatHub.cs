@@ -108,12 +108,7 @@ public class ChatHub : Hub
         
         var chatRoom = await _chatRoomService.AddUsersToChatAsync(userId, chatId, chatRoomAddUsers);
 
-        List<string> otherUserConnectionIds = [];
-        
-        foreach (var addUserId in chatRoomAddUsers.UserIds)
-        {
-            otherUserConnectionIds.AddRange(Connections.GetConnections(addUserId)); 
-        }
+        var otherUserConnectionIds = Connections.GetConnections(chatRoom.UserIds);
         
         foreach (var connectionId in otherUserConnectionIds)
         {
@@ -122,7 +117,7 @@ public class ChatHub : Hub
         }
     }
     
-    public async Task LeaveChatRoom(Guid chatId)
+    public async Task LeaveGroupChatRoom(Guid chatId)
     {
         var userId = GetUserId();
         
@@ -130,7 +125,17 @@ public class ChatHub : Hub
         
         await Groups.RemoveFromGroupAsync(Context.ConnectionId, chatId.ToString());
         
-        await Clients.Caller.SendAsync("ReceiveChatRoom", chatRoom);
+        if (chatRoom is null)
+        {
+            return;
+        }
+        
+        var otherUserConnectionIds = Connections.GetConnections(chatRoom.UserIds);
+        
+        foreach (var connectionId in otherUserConnectionIds)
+        {
+            await Clients.Client(connectionId).SendAsync("ReceiveChatRoom", chatRoom);
+        }
     }
     
     public async Task SendMessage(Guid chatId, MessageCreate message)

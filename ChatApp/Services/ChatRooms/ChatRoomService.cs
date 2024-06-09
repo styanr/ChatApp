@@ -173,7 +173,7 @@ namespace ChatApp.Services.ChatRooms
             return chatRoom.ToChatRoomDetails();
         }
         
-        public async Task<ChatRoomDetails> LeaveChatAsync(Guid userId, Guid chatId)
+        public async Task<ChatRoomDetails?> LeaveChatAsync(Guid userId, Guid chatId)
         {
             var chatRoom = await GetGroupChatRoomWithUserValidationAsync(chatId, userId);
             
