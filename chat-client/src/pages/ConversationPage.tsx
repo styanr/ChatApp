@@ -28,14 +28,14 @@ const ConversationPage: FC<ConversationPageProps> = () => {
   const { id } = useParams()
   const [page, setPage] = useState(1)
   const [messageContent, setMessageContent] = useState("")
+  const [scrollTop, setScrollTop] = useState(0)
   const [showScrollToBottom, setShowScrollToBottom] = useState(false)
   const [showInfoModal, setShowInfoModal] = useState(false)
 
   const [attachment, setAttachment] = useState<File | null>(null)
   const [attachmentId, setAttachmentId] = useState<string | null>(null)
 
-  const { uploadFile, getFile, isLoading, isUploading, error, uploadError } =
-    useFiles()
+  const { uploadFile, isUploading, uploadError } = useFiles()
 
   const {
     data: messages,
@@ -81,6 +81,16 @@ const ConversationPage: FC<ConversationPageProps> = () => {
     setShowScrollToBottom(false)
   }
 
+  const onScroll = (e: Event) => {
+    const { scrollTop, scrollHeight, clientHeight } = e.target as HTMLDivElement
+    setScrollTop(scrollTop)
+    if (scrollTop + clientHeight < scrollHeight - 100) {
+      setShowScrollToBottom(true)
+    } else {
+      setShowScrollToBottom(false)
+    }
+  }
+
   useEffect(() => {
     console.log(messages)
     if (messagesContainerRef.current) {
@@ -89,16 +99,13 @@ const ConversationPage: FC<ConversationPageProps> = () => {
       const isAtBottom = Math.abs(scrollTop - scrollHeight + clientHeight) < 100
       if (isAtBottom) {
         scrollToBottom()
-      } else {
-        setShowScrollToBottom(true)
       }
     }
   }, [messages])
 
   useEffect(() => {
     if (messagesContainerRef.current) {
-      const { scrollHeight } = messagesContainerRef.current
-      messagesContainerRef.current.scrollTop = scrollHeight
+      messagesContainerRef.current.addEventListener("scroll", onScroll)
     }
   }, [id])
 
@@ -151,7 +158,7 @@ const ConversationPage: FC<ConversationPageProps> = () => {
     otherUserLoading
   ) {
     return (
-      <div className="flex-1 bg-slate-900 text-white flex justify-center items-center">
+      <div className="flex-1 bg-ca-dark-gray text-white flex justify-center items-center">
         Loading...
       </div>
     )
@@ -159,7 +166,7 @@ const ConversationPage: FC<ConversationPageProps> = () => {
 
   if (messagesError || chatRoomError || currentUserError || otherUserError) {
     return (
-      <div className="flex-1 bg-slate-900 text-white flex justify-center items-center">
+      <div className="flex-1 bg-ca-dark-gray text-white flex justify-center items-center">
         Error...
       </div>
     )
@@ -168,12 +175,12 @@ const ConversationPage: FC<ConversationPageProps> = () => {
   const isGroupChat = chatRoom?.type === "group"
 
   return (
-    <div className="flex-1 mb-20 bg-slate-900 text-white flex flex-col overflow-hidden relative">
+    <div className="flex-1 mb-20 bg-ca-dark-gray text-white flex flex-col overflow-hidden relative">
       {chatRoom && (
         <>
           {isGroupChat ? (
             <button
-              className="fixed top-0 left-0 right-0 flex items-center px-5 py-4 bg-slate-800 hover:bg-gray-700 transition-colors duration-300 z-10"
+              className="fixed top-0 left-0 right-0 flex items-center px-5 py-4 bg-ca-gray hover:bg-ca-light-gray transition-colors duration-300 z-10"
               onClick={() => setShowInfoModal(true)}
             >
               <ProfileImage id={chatRoom.pictureId} size={12} />
@@ -183,7 +190,7 @@ const ConversationPage: FC<ConversationPageProps> = () => {
             otherUser && (
               <Link
                 to={`/contacts/${otherUserId}`}
-                className="fixed top-0 left-0 right-0 flex items-center px-5 py-4 bg-slate-800 hover:bg-gray-700 transition-colors duration-300 z-10"
+                className="fixed top-0 left-0 right-0 flex items-center px-5 py-4 bg-ca-gray hover:bg-ca-light-gray transition-colors duration-300 z-10"
               >
                 <ProfileImage id={otherUser.profilePictureId} size={12} />
                 <h2 className="font-semibold ml-4">{otherUser.displayName}</h2>
@@ -212,7 +219,7 @@ const ConversationPage: FC<ConversationPageProps> = () => {
       {showScrollToBottom && (
         <button
           onClick={scrollToBottom}
-          className="absolute bottom-24 right-4 bg-indigo-800 hover:bg-indigo-900 text-white font-bold py-2 px-4 rounded-full shadow-lg transition-colors duration-300 z-20 aspect-square"
+          className="absolute bottom-24 right-4 bg-ca-blue hover:bg-ca-dark-blue text-white font-bold py-2 px-4 rounded-full shadow-lg transition-colors duration-300 z-20 aspect-square"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -230,7 +237,7 @@ const ConversationPage: FC<ConversationPageProps> = () => {
           </svg>
         </button>
       )}
-      <div className="flex p-4 gap-2 bg-slate-800 z-10">
+      <div className="flex p-4 gap-2 bg-ca-gray z-10">
         <input
           type="file"
           id="file-input"
@@ -238,37 +245,41 @@ const ConversationPage: FC<ConversationPageProps> = () => {
           onChange={handleFileChange}
         />
         <button
-          className="bg-slate-700 hover:bg-slate-600 text-white font-bold py-2 px-4 rounded"
+          className="bg-ca-gray hover:bg-ca-dark-blue text-white font-bold py-2 px-4 rounded"
           onClick={() => document.getElementById("file-input")?.click()}
         >
           <RiAttachment2 size={24} />
         </button>
-        <input
-          type="text"
-          className="w-full p-4 bg-slate-700 rounded text-white"
-          placeholder="Type a message..."
-          value={messageContent}
-          onChange={e => setMessageContent(e.target.value)}
-        />
-        <button
-          onClick={handleSendMessage}
-          className="bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-4 rounded"
+        <form
+          className="flex w-full gap-4"
+          onSubmit={e => {
+            e.preventDefault()
+            handleSendMessage()
+          }}
         >
-          <RiSendPlaneFill size={24} />
-        </button>
+          <input
+            type="text"
+            className="flex-1 p-4 bg-ca-gray rounded text-white"
+            placeholder="Type a message..."
+            value={messageContent}
+            onChange={e => setMessageContent(e.target.value)}
+          />
+          <button className="bg-ca-blue hover:bg-ca-dark-blue text-white font-bold py-2 px-4 rounded">
+            <RiSendPlaneFill size={24} />
+          </button>
+        </form>
       </div>
-      <div className="flex p-4 gap-2 bg-slate-800 z-10">
-        {attachment && (
-          <div className="flex p-4 gap-2 bg-slate-800 z-10">
-            <div className="relative flex items-center">
-              <span className="mr-2">{attachment.name}</span>
-              <button onClick={handleRemoveAttachment} className="text-red-500">
-                &times;
-              </button>
-            </div>
+      {attachment && (
+        <div className="flex p-4 gap-2 bg-ca-gray z-10">
+          <div className="relative flex items-center">
+            <span className="mr-2">{attachment.name}</span>
+            <button onClick={handleRemoveAttachment} className="text-red-500">
+              &times;
+            </button>
           </div>
-        )}
-      </div>
+        </div>
+      )}
+
       {showInfoModal && (
         <ViewGroupChatRoomModal
           chatRoom={chatRoom!}

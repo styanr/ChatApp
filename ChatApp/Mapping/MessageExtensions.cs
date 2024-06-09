@@ -13,7 +13,7 @@ public static class MessageExtensions
             message.ChatRoomId,
             message.AuthorId,
             message.IsDeleted ? "" : message.Content,
-            message.AttachmentId,
+            message.IsDeleted ? null : message.AttachmentId,
             message.CreatedAt,
             message.EditedAt,
             message.IsDeleted

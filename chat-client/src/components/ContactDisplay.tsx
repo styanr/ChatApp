@@ -26,7 +26,7 @@ const ContactDisplay: FC<ContactDisplayProps> = ({
   onLogout,
 }) => {
   return (
-    <div className="flex-1 bg-slate-800 text-white flex overflow-y-auto mb-20">
+    <div className="flex-1 bg-ca-gray text-white flex overflow-y-auto mb-20">
       <div className="flex flex-col w-full">
         <div className="flex flex-row items-center justify-between p-6">
           <div className="flex flex-row items-center">
@@ -46,11 +46,11 @@ const ContactDisplay: FC<ContactDisplayProps> = ({
                 <RiMore2Fill className="w-6 h-6" />
               </MenuButton>
             }
-            menuClassName="box-border z-50 text-sm bg-gray-800 py-3 border rounded-md shadow-lg select-none focus:outline-none min-w-[9rem] border-none w-48"
+            menuClassName="box-border z-50 text-sm bg-ca-dark py-3 border rounded-md shadow-lg select-none focus:outline-none min-w-[9rem] border-none w-48"
           >
             {(isCurrentUser || data?.isContact) && (
               <MenuItem
-                className="px-3 py-3 focus:bg-gray-700"
+                className="px-3 py-3 focus:bg-ca-dark-gray"
                 onClick={onEdit}
               >
                 <div className="flex items-center flex-row">
@@ -61,7 +61,7 @@ const ContactDisplay: FC<ContactDisplayProps> = ({
             )}
             {isCurrentUser ? (
               <MenuItem
-                className="px-3 py-3 focus:bg-gray-700"
+                className="px-3 py-3 focus:bg-ca-dark-gray"
                 onClick={onLogout}
               >
                 <div className="flex items-center flex-row">
@@ -74,7 +74,7 @@ const ContactDisplay: FC<ContactDisplayProps> = ({
                 {data?.isContact ? (
                   <>
                     <MenuItem
-                      className="px-3 py-3 focus:bg-gray-700"
+                      className="px-3 py-3 focus:bg-ca-dark-gray"
                       onClick={onDelete}
                     >
                       <div className="flex items-center flex-row">
@@ -95,7 +95,7 @@ const ContactDisplay: FC<ContactDisplayProps> = ({
             )}
           </Menu>
         </div>
-        <div className="flex-1 bg-gray-900 p-6">
+        <div className="flex-1 bg-ca-dark-gray p-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <InfoCard title="Bio" value={data?.bio || "N/A"} />
             <InfoCard title="Handle" value={data?.handle || "N/A"} />
@@ -108,7 +108,7 @@ const ContactDisplay: FC<ContactDisplayProps> = ({
 
 const InfoCard: FC<{ title: string; value: string }> = ({ title, value }) => {
   return (
-    <div className="flex flex-col w-full bg-slate-800 p-6 rounded-lg overflow-hidden shadow-lg">
+    <div className="flex flex-col w-full bg-ca-gray p-6 rounded-lg overflow-hidden shadow-lg">
       <h2 className="text-lg font-bold mb-1">{title}</h2>
       <p className="">{value}</p>
     </div>

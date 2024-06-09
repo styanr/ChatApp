@@ -6,14 +6,15 @@ import { useLongPress } from "@uidotdev/usehooks"
 import useFiles from "../app/hooks/useFiles"
 
 import { ControlledMenu, MenuItem, MenuButton } from "@szhsin/react-menu"
-import { RiDeleteBin6Fill, RiEdit2Fill } from "react-icons/ri"
-
+import { RiDeleteBin6Fill, RiEdit2Fill, RiFile2Fill } from "react-icons/ri"
+import ProfileImage from "./ProfileImage"
+import { Link } from "react-router-dom"
 interface AttachmentProps {
   attachmentId: string
 }
 
 const Attachment: FC<AttachmentProps> = ({ attachmentId }) => {
-  const { getFile } = useFiles()
+  const { getFile, isLoading } = useFiles()
   const [file, setFile] = useState<{ url: string; type: string }>({
     url: "",
     type: "",
@@ -32,6 +33,14 @@ const Attachment: FC<AttachmentProps> = ({ attachmentId }) => {
     setIsFullScreen(!isFullScreen)
   }
 
+  if (isLoading) {
+    return (
+      <div className="p-2 bg-ca-light-blue rounded-xl relative flex flex-col items-center justify-center">
+        <RiFile2Fill className="w-10 h-10" />
+      </div>
+    )
+  }
+
   return (
     <>
       <div className="flex items-center gap-2 pb-3">
@@ -46,17 +55,31 @@ const Attachment: FC<AttachmentProps> = ({ attachmentId }) => {
         {file.type.startsWith("video/") && (
           <video
             controls
-            className="h-auto rounded-md shadow-md cursor-pointer md:max-h-96 md:max-w-96 object-cover max-h-48 max-w-48"
+            className="h-auto rounded-md shadow-md cursor-pointer md:max-h-96 md:max-w-96 max-h-48 max-w-48"
           >
             <source src={file.url} type={file.type} />
             Your browser does not support the video tag.
           </video>
         )}
-        {!file.type.startsWith("image/") && !file.type.startsWith("video/") && (
-          <a href={file.url} download className="text-blue-500 underline">
-            Download Attachment
-          </a>
+        {file.type.startsWith("audio/") && (
+          <audio controls={true} className="rounded-md shadow-md">
+            <source src={file.url} type={file.type} />
+            Your browser does not support the audio tag.
+          </audio>
         )}
+        {!file.type.startsWith("image/") &&
+          !file.type.startsWith("video/") &&
+          !file.type.startsWith("audio/") && (
+            <a href={file.url} download className="flex items-center gap-2">
+              <div className="p-2 bg-ca-light-blue rounded-xl relative flex flex-col items-center justify-center">
+                <RiFile2Fill className="w-10 h-10" />
+                <div className="flex justify-center items-center text-white text-xs">
+                  {file.type}
+                </div>
+              </div>
+              <div>Download</div>
+            </a>
+          )}
       </div>
 
       {isFullScreen && file.type.startsWith("image/") && (
@@ -124,92 +147,104 @@ const Message: FC<MessageProps> = ({
     return <div>Error...</div>
   }
 
+  const isNoContent = !message.content && message.attachmentId
+
   return (
     <div
-      className={`flex flex-col gap-2 ${isCurrentUser ? "items-end" : "items-start"}`}
+      className={`flex gap-2 ${isCurrentUser ? "justify-end" : "justify-start"} mb-2`}
     >
-      {isGroupChat && author && (
-        <div className="text-xs text-gray-400">{author.displayName}</div>
-      )}
-      <div
-        className={`px-5 py-3 mb-2 rounded-2xl w-fit ${
-          isCurrentUser
-            ? "ml-auto bg-blue-500 text-right"
-            : "mr-auto bg-slate-800 text-left"
-        }`}
-        ref={ref}
-        {...attrs}
-      >
-        <ControlledMenu
-          state={isMenuOpen ? "open" : "closed"}
-          onClose={() => setIsMenuOpen(false)}
-          anchorRef={ref}
-          menuClassName="box-border z-50 text-sm bg-gray-800 py-3 border rounded-md shadow-lg select-none focus:outline-none min-w-[9rem] border-none w-48"
-        >
-          <MenuItem
-            className="px-3 py-3 focus:bg-gray-700"
-            onClick={() => setIsEditing(true)}
-          >
-            <div className="flex items-center flex-row">
-              <RiEdit2Fill className="w-6 h-6 pr-2" />
-              Edit
-            </div>
-          </MenuItem>
-          <MenuItem
-            className="px-3 py-3 focus:bg-gray-700"
-            onClick={handleDelete}
-          >
-            <div className="flex items-center flex-row">
-              <RiDeleteBin6Fill className="w-6 h-6 pr-2" />
-              Delete
-            </div>
-          </MenuItem>
-        </ControlledMenu>
-        {isEditing ? (
-          <>
-            <input
-              type="text"
-              value={newContent}
-              onChange={e => setNewContent(e.target.value)}
-              className="text-white bg-slate-600 rounded p-1"
-            />
-            <button onClick={handleEdit} className="text-blue-400 ml-2">
-              Save
-            </button>
-            <button
-              onClick={() => setIsEditing(false)}
-              className="text-red-400 ml-2"
-            >
-              Cancel
-            </button>
-          </>
-        ) : (
-          <>
-            <div className="text-white">
-              {message.isDeleted ? (
-                <>
-                  <span className="italic">This message was deleted</span>
-                </>
-              ) : (
-                <>
-                  {message.attachmentId && (
-                    <Attachment attachmentId={message.attachmentId} />
-                  )}
-                  {message.content}
-                </>
-              )}
-            </div>
-            {message.editedAt ? (
-              <div className="text-xs text-gray-400">
-                edited {convertUTCtoLocal(message.editedAt)}
-              </div>
-            ) : (
-              <div className="text-xs text-gray-400">
-                {convertUTCtoLocal(message.createdAt)}
-              </div>
-            )}
-          </>
+      <div className="flex gap-2 items-end">
+        {!isCurrentUser && (
+          <Link to={`/contacts/${author?.id}`} className="flex items-center">
+            <ProfileImage id={author?.profilePictureId} size={12} />
+          </Link>
         )}
+        <div>
+          <div
+            className={`flex flex-col ${
+              isCurrentUser ? "items-end" : "items-start"
+            } rounded-2xl w-fit ${
+              isNoContent
+                ? ""
+                : isCurrentUser
+                  ? "px-5 py-3 bg-ca-blue"
+                  : "px-5 py-3 bg-ca-gray"
+            }`}
+            ref={ref}
+            {...attrs}
+          >
+            <ControlledMenu
+              state={isMenuOpen ? "open" : "closed"}
+              onClose={() => setIsMenuOpen(false)}
+              anchorRef={ref}
+              menuClassName="box-border z-50 text-sm bg-ca-dark py-3 border rounded-md shadow-lg select-none focus:outline-none min-w-[9rem] border-none w-48"
+            >
+              <MenuItem
+                className="px-3 py-3 focus:bg-ca-dark-gray"
+                onClick={() => setIsEditing(true)}
+              >
+                <div className="flex items-center flex-row">
+                  <RiEdit2Fill className="w-6 h-6 pr-2" />
+                  Edit
+                </div>
+              </MenuItem>
+              <MenuItem
+                className="px-3 py-3 focus:bg-ca-dark-gray"
+                onClick={handleDelete}
+              >
+                <div className="flex items-center flex-row">
+                  <RiDeleteBin6Fill className="w-6 h-6 pr-2" />
+                  Delete
+                </div>
+              </MenuItem>
+            </ControlledMenu>
+            {isEditing ? (
+              <>
+                <input
+                  type="text"
+                  value={newContent}
+                  onChange={e => setNewContent(e.target.value)}
+                  className="text-white bg-ca-dark-blue rounded p-1"
+                />
+                <button onClick={handleEdit} className="text-ca-dark-blue ml-2">
+                  Save
+                </button>
+                <button
+                  onClick={() => setIsEditing(false)}
+                  className="text-red-400 ml-2"
+                >
+                  Cancel
+                </button>
+              </>
+            ) : (
+              <>
+                <div className="text-white">
+                  {message.isDeleted ? (
+                    <>
+                      <span className="italic">This message was deleted</span>
+                    </>
+                  ) : (
+                    <>
+                      {message.attachmentId && (
+                        <Attachment attachmentId={message.attachmentId} />
+                      )}
+                      {message.content}
+                    </>
+                  )}
+                </div>
+                {message.editedAt ? (
+                  <div className="text-xs">
+                    edited {convertUTCtoLocal(message.editedAt)}
+                  </div>
+                ) : (
+                  <div className="text-xs">
+                    {convertUTCtoLocal(message.createdAt)}
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+        </div>
       </div>
     </div>
   )

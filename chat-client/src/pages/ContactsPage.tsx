@@ -73,10 +73,11 @@ const ContactsPage: FC<ContactsPageProps> = ({}) => {
   }, [usersListResponse])
 
   return (
-    <div className="flex-1 bg-slate-900 text-white flex flex-col overflow-y-auto mb-20">
-      <div className="bg-gray-800 py-3 px-5 flex items-center justify-center">
-        <form className="w-full">
-          <div className="flex flex-row w-full bg-gray-700 rounded-md overflow-hidden">
+    <div className="flex-1 bg-ca-dark-gray text-white flex flex-col overflow-y-auto mb-20">
+      <div className="bg-ca-gray py-3 px-5 flex items-center justify-center">
+        <form className="w-full" onSubmit={
+            e => e.preventDefault()}>
+          <div className="flex flex-row w-full rounded-md overflow-hidden border border-ca-light-blue">
             <input
               type="text"
               placeholder="Search users..."
@@ -84,7 +85,7 @@ const ContactsPage: FC<ContactsPageProps> = ({}) => {
               value={searchTerm}
               onChange={handleSearch}
             />
-            <button className="p-2 bg-gray-600 hover:bg-gray-500 transition-colors duration-300">
+            <button className="p-2 bg-ca-blue hover:bg-ca-dark-blue transition-colors duration-300">
               <RiSearch2Line className="w-6 h-6 text-gray-100" />
             </button>
           </div>
@@ -113,14 +114,14 @@ const ContactsPage: FC<ContactsPageProps> = ({}) => {
         )}
         {!debouncedSearchTerm && contactsListResponse && (
           <>
-            <h2 className=" bg-gray-800 text-gray-100 px-5 py-3 uppercase font-bold tracking-widest">
+            <h2 className=" bg-ca-gray text-gray-100 px-5 py-3 uppercase font-bold tracking-widest">
               Contacts
             </h2>
             <ul className="divide-y divide-gray-700">
               {contactsListResponse.users.map((contact, index) => (
                 <li
                   key={contact.id}
-                  className="bg-gray-800 hover:bg-gray-700 transition-colors duration-300"
+                  className="bg-ca-gray hover:bg-gray-700 transition-colors duration-300"
                 >
                   <Link
                     to={`/contacts/${contact.id}`}
@@ -148,7 +149,7 @@ const ContactsPage: FC<ContactsPageProps> = ({}) => {
               return (
                 <li
                   key={user.id}
-                  className="bg-gray-800 hover:bg-gray-700 transition-colors duration-300"
+                  className="bg-ca-gray hover:bg-gray-700 transition-colors duration-300"
                   ref={isLastUser ? lastUserRef : null}
                 >
                   <Link

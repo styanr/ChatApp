@@ -88,7 +88,7 @@ const CreateChatRoomModal: FC<CreateChatRoomModalProps> = ({
 
   return (
     <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
-      <div className="bg-slate-800 rounded-lg shadow-lg p-6">
+      <div className="bg-ca-dark-gray rounded-lg shadow-lg p-6">
         <h2 className="text-xl font-bold mb-4">Create Chat Room</h2>
         {errors.map(
           (error: any, index: number) =>
@@ -99,7 +99,7 @@ const CreateChatRoomModal: FC<CreateChatRoomModalProps> = ({
             ),
         )}
         <select
-          className="rounded-md px-3 py-2 w-full mb-4 bg-gray-900 text-white"
+          className="rounded-md px-3 py-2 w-full mb-4 bg-ca-dark text-white"
           onChange={e => setNewChatRoomType(e.target.value as any)}
         >
           <option value="group">Group</option>
@@ -110,7 +110,7 @@ const CreateChatRoomModal: FC<CreateChatRoomModalProps> = ({
             <input
               type="text"
               name="name"
-              className="rounded-md px-3 py-2 w-full mb-4 bg-gray-900 text-white"
+              className="rounded-md px-3 py-2 w-full mb-4 bg-ca-dark text-white"
               value={groupChatRoomRequest.name}
               onChange={handleInputChange}
               placeholder="Group Name"
@@ -125,7 +125,7 @@ const CreateChatRoomModal: FC<CreateChatRoomModalProps> = ({
               </div>
             ) : (
               <select
-                className="rounded-md px-3 py-2 w-full mb-4 bg-gray-900 text-white"
+                className="rounded-md px-3 py-2 w-full mb-4 bg-ca-dark text-white"
                 onChange={handleInputChange}
               >
                 <option value="" disabled selected>
@@ -143,13 +143,13 @@ const CreateChatRoomModal: FC<CreateChatRoomModalProps> = ({
         )}
         <div className="flex justify-end">
           <button
-            className="bg-gray-900 hover:bg-gray-800 text-white font-bold py-2 px-4 rounded mr-2"
+            className="bg-ca-dark hover:bg-ca-gray text-white font-bold py-2 px-4 rounded mr-2"
             onClick={onCancel}
           >
             Cancel
           </button>
           <button
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded disabled:opacity-50 disabled:pointer-events-none"
+            className="bg-ca-blue hover:bg-ca-dark-blue text-white font-bold py-2 px-4 rounded disabled:opacity-50 disabled:pointer-events-none"
             onClick={handleSave}
             disabled={!IsEnabled()}
           >
@@ -191,7 +191,7 @@ const MessagesPage: FC<MessagesPageProps> = ({}) => {
   }
 
   return (
-    <div className="flex-1 bg-slate-900 text-white flex overflow-y-auto mb-20 relative">
+    <div className="flex-1 bg-ca-dark-gray text-white flex overflow-y-auto mb-20 relative">
       {showCreateChatRoomModal && (
         <CreateChatRoomModal
           onSave={handleCreateChatRoom}
@@ -201,7 +201,7 @@ const MessagesPage: FC<MessagesPageProps> = ({}) => {
       )}
 
       {isLoading && (
-        <div className="flex justify-center items-center h-full">
+        <div className="flex justify-center items-center h-full w-full">
           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-gray-500"></div>
         </div>
       )}
@@ -235,7 +235,7 @@ const MessagesPage: FC<MessagesPageProps> = ({}) => {
                       <Link
                         to={`/messages/${chatRoom.id}`}
                         key={chatRoom.id}
-                        className={`flex items-center px-5 py-4 bg-${index % 2 === 0 ? "slate-900" : "gray-800"} hover:bg-indigo-900 active:bg-indigo-900 transition-colors`}
+                        className="flex items-center px-5 py-4 hover:bg-ca-gray active:bg-ca-gray transition-colors"
                       >
                         <ProfileImage id={chatRoom.pictureId} size={12} />
                         <div className="flex flex-row w-full justify-between items-center">
@@ -273,7 +273,7 @@ const MessagesPage: FC<MessagesPageProps> = ({}) => {
           )}
           <div className="absolute bottom-0 right-0 p-5">
             <button
-              className="bg-blue-500 p-3 rounded-xl hover:bg-blue-400"
+              className="bg-ca-blue p-3 rounded-xl hover:bg-ca-dark-blue"
               onClick={() => setShowCreateChatRoomModal(true)}
               disabled={isCreatingDirectChatRoom || isCreatingGroupChatRoom}
             >

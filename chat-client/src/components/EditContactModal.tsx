@@ -19,23 +19,23 @@ const EditContactModal: FC<EditContactModalProps> = ({
 
   return (
     <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50 text-white">
-      <div className="bg-slate-800 rounded-lg shadow-lg p-6">
+      <div className="bg-ca-dark-gray rounded-lg shadow-lg p-6">
         <h2 className="text-xl font-bold mb-4">Edit Contact</h2>
         <input
           type="text"
-          className="rounded-md px-3 py-2 w-full mb-4 bg-gray-900 text-white"
+          className="rounded-md px-3 py-2 w-full mb-4 bg-ca-dark text-white"
           value={newDisplayName}
           onChange={e => setNewDisplayName(e.target.value)}
         />
         <div className="flex justify-end">
           <button
-            className="bg-gray-900 hover:bg-gray-800 text-white font-bold py-2 px-4 rounded mr-2"
+            className="bg-ca-dark hover:bg-ca-gray text-white font-bold py-2 px-4 rounded mr-2"
             onClick={onCancel}
           >
             Cancel
           </button>
           <button
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+            className="bg-ca-blue hover:bg-ca-dark-blue text-white font-bold py-2 px-4 rounded"
             onClick={handleSave}
           >
             Save

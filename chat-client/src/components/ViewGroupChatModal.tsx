@@ -45,7 +45,7 @@ const ViewGroupChatModal: FC<ViewGroupChatModalProps> = ({
   }
 
   return (
-    <div className="fixed inset-0 bg-slate-800 shadow-lg p-6 w-full z-20 flex items-center justify-center">
+    <div className="fixed inset-0 bg-ca-dark-gray shadow-lg p-6 w-full z-20 flex items-center justify-center">
       <div className="max-w-md w-full h-full">
         {isEditing ? (
           <EditGroupChatModal
@@ -74,7 +74,7 @@ const ViewGroupChatModal: FC<ViewGroupChatModalProps> = ({
               <div>
                 <button
                   onClick={() => setIsEditing(true)}
-                  className="text-white hover:bg-slate-700 rounded-lg transition-colors duration-300 p-3"
+                  className="text-white hover:bg-ca-gray rounded-lg transition-colors duration-300 p-3"
                 >
                   <RiEdit2Fill className="w-5 h-5" />
                 </button>
@@ -94,7 +94,7 @@ const ViewGroupChatModal: FC<ViewGroupChatModalProps> = ({
                 <h3 className="text-lg font-semibold">Members</h3>
                 <button
                   onClick={() => setIsAddingUsers(true)}
-                  className="text-white hover:bg-slate-700 rounded-lg transition-colors duration-300 p-3"
+                  className="text-white hover:bg-ca-gray rounded-lg transition-colors duration-300 p-3"
                 >
                   <RiPencilFill className="w-5 h-5" />
                 </button>
@@ -160,7 +160,7 @@ const EditGroupChatModal: FC<ViewGroupChatModalProps> = ({
           id="name"
           value={groupChat.name}
           onChange={e => setGroupChat({ ...groupChat, name: e.target.value })}
-          className="bg-slate-700 text-white w-full p-2 rounded-lg mt-1"
+          className="bg-ca-gray text-white w-full p-2 rounded-lg mt-1"
         />
 
         <label htmlFor="description" className="block text-white mt-4">
@@ -172,7 +172,7 @@ const EditGroupChatModal: FC<ViewGroupChatModalProps> = ({
           onChange={e =>
             setGroupChat({ ...groupChat, description: e.target.value })
           }
-          className="bg-slate-700 text-white w-full p-2 rounded-lg mt-1"
+          className="bg-ca-gray text-white w-full p-2 rounded-lg mt-1"
         />
       </div>
 
@@ -231,14 +231,14 @@ const AddUsersToGroupChatModal: FC<ViewGroupChatModalProps> = ({
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-30">
       <div className="w-full h-full flex flex-col items-center justify-center">
-        <div className="bg-slate-800 p-6 rounded-lg">
+        <div className="bg-ca-dark-gray p-6 rounded-lg">
           <h2 className="text-white text-lg font-semibold">Add Users</h2>
 
           <div className="flex flex-col gap-2 mt-4">
             {contacts.users.map(contact => (
               <label
                 key={contact.id}
-                className={`flex items-center justify-between gap-2 py-3 px-5 ${userIds.includes(contact.id) ? "bg-slate-700" : ""} rounded-lg transition-colors duration-300 min-w-80`}
+                className={`flex items-center justify-between gap-2 py-3 px-5 ${userIds.includes(contact.id) ? "bg-ca-gray" : ""} rounded-lg transition-colors duration-300 min-w-80`}
               >
                 <div className="flex items-center gap-2">
                   <ProfileImage id={contact.profilePictureId} size={10} />
@@ -297,7 +297,7 @@ const UserListItem: FC<{ userId: string }> = ({ userId }) => {
   return (
     <Link
       className="flex items-center gap-4
-    hover:bg-slate-700 px-2 py-2 rounded-lg transition-colors duration-300
+    hover:bg-ca-gray px-2 py-2 rounded-lg transition-colors duration-300
     "
       to={`/contacts/${userId}`}
     >

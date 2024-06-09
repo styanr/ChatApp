@@ -28,12 +28,13 @@ const rootReducer = (state: any, action: any) => {
 const persistConfig = {
   key: "root",
   storage,
+  whitelist: ["auth"],
 }
 
-// const persistedReducer = persistReducer(persistConfig, rootReducer)
+const persistedReducer = persistReducer(persistConfig, rootReducer)
 
 export const store = configureStore({
-  reducer: rootReducer,
+  reducer: persistedReducer,
   middleware: getDefaultMiddleware => {
     return getDefaultMiddleware().concat(apiSlice.middleware)
   },

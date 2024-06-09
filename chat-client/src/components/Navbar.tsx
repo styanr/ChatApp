@@ -39,15 +39,17 @@ const Links: NavBarItem[] = [
 
 const Navbar: React.FC = () => {
   return (
-    <div className="h-20 w-full bg-slate-950 fixed bottom-0 left-0 right-0">
+    <div className="h-20 w-full bg-ca-dark fixed bottom-0 left-0 right-0">
       <nav className="h-full">
         <ul className="flex justify-around items-center h-full">
           {Links.map(link => (
             <li key={link.name}>
               <NavLink
                 to={link.link}
-                className="flex flex-col items-center justify-center h-full text-slate-100 
-                     hover:bg-slate-800 focus:bg-slate-800 transition-colors duration-300 ease-in-out p-3 rounded-xl"
+                className={({ isActive, isPending }) =>
+                  (isActive ? "bg-ca-dark-gray " : "") +
+                  "flex flex-col items-center justify-center h-full text-slate-100  hover:bg-ca-dark-gray focus:bg-ca-dark-gray transition-colors duration-300 ease-in-out p-3 rounded-xl"
+                }
               >
                 {({ isActive }) => (
                   <>
