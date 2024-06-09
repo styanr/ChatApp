@@ -20,7 +20,7 @@ const createConnection = (token: string) => {
   console.log("Creating new connection. Token: ", token)
 
   connection = new HubConnectionBuilder()
-    .withUrl("http://localhost:5117/chat", {
+    .withUrl(import.meta.env.VITE_SERVER_URL + "chat", {
       accessTokenFactory: () => token,
     })
     .configureLogging(LogLevel.Information)

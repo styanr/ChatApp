@@ -149,10 +149,19 @@ builder.Services.AddCors(options =>
             .AllowCredentials();
     });
 });
+
+var blobStorageConnectionString = configuration["ConnectionStrings:Storage"];
+
+Console.WriteLine(blobStorageConnectionString);
+
+if (string.IsNullOrEmpty(blobStorageConnectionString))
+{
+    throw new InvalidOperationException("Storage connection string is missing");
+}
+
 builder.Services.AddAzureClients(clientBuilder =>
 {
-    clientBuilder.AddBlobServiceClient(builder.Configuration["Azurite:blob"], preferMsi: true);
-    clientBuilder.AddQueueServiceClient(builder.Configuration["Azurite:queue"], preferMsi: true);
+    clientBuilder.AddBlobServiceClient(blobStorageConnectionString, preferMsi: true);
 });
 
 builder.Services.AddExceptionHandler<AppExceptionHandler>();

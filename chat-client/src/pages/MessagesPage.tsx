@@ -42,7 +42,7 @@ const CreateChatRoomModal: FC<CreateChatRoomModalProps> = ({
     "group",
   )
   const [groupChatRoomRequest, setGroupChatRoomRequest] =
-    useState<GroupChatRoomCreateRequest>({ name: "", pictureId: "" })
+    useState<GroupChatRoomCreateRequest>({ name: "" })
   const [directChatRoomRequest, setDirectChatRoomRequest] =
     useState<DirectChatRoomCreateRequest>({ otherUserId: "" })
 
@@ -244,9 +244,15 @@ const MessagesPage: FC<MessagesPageProps> = ({}) => {
                               {chatRoom.name}
                             </span>
                             <span className="text-sm">
-                              {chatRoom.lastMessage
-                                ? chatRoom.lastMessage.content
-                                : "No messages"}
+                              {chatRoom.lastMessage ? (
+                                chatRoom.lastMessage.isDeleted ? (
+                                  <i>Deleted message</i>
+                                ) : (
+                                  chatRoom.lastMessage.content
+                                )
+                              ) : (
+                                "No messages"
+                              )}
                             </span>
                           </div>
                           <div className="flex flex-col ml-3">
