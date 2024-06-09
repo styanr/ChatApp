@@ -11,6 +11,7 @@ import ContactsPage from "./pages/ContactsPage"
 import ContactPage from "./pages/ContactPage"
 import MessagesPage from "./pages/MessagesPage"
 import ConversationPage from "./pages/ConversationPage"
+import RegisterPage from "./pages/RegisterPage"
 
 const App = () => {
   return (
@@ -18,6 +19,7 @@ const App = () => {
       <Route path="/" element={<Layout />}>
         {/* public routes */}
         <Route path="login" element={<AuthPage />} />
+        <Route path="register" element={<RegisterPage />} />
 
         {/* protected routes */}
         <Route element={<RequireAuth />}>

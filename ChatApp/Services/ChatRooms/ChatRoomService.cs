@@ -1,6 +1,7 @@
 ﻿using System.Security.Claims;
 using ChatApp.Entities;
 using ChatApp.Exceptions;
+using ChatApp.Hubs;
 using ChatApp.Managers;
 using ChatApp.Mapping;
 using ChatApp.Models.ChatRooms;
@@ -9,6 +10,7 @@ using ChatApp.Repositories.ChatRooms;
 using ChatApp.Repositories.Contacts;
 using ChatApp.Repositories.Messages;
 using ChatApp.Repositories.Users;
+using Microsoft.AspNetCore.SignalR;
 
 namespace ChatApp.Services.ChatRooms
 {
@@ -17,13 +19,16 @@ namespace ChatApp.Services.ChatRooms
         private readonly IChatRoomRepository _chatRoomRepository;
         private readonly IUserRepository _userRepository;
         private readonly IContactRepository _contactRepository;
+        private readonly IHubContext<ChatHub> _hubContext;
 
         public ChatRoomService(IChatRoomRepository chatRoomRepository, IUserRepository userRepository,
-            IContactRepository contactRepository, IUserManager userManager)
+            IContactRepository contactRepository, IHubContext<ChatHub> hubContext)
+
         {
             _chatRoomRepository = chatRoomRepository;
             _userRepository = userRepository;
             _contactRepository = contactRepository;
+            _hubContext = hubContext;
         }
 
         public async Task<IEnumerable<ChatRoomSummary>> GetAllAsync(Guid userId)
@@ -159,6 +164,30 @@ namespace ChatApp.Services.ChatRooms
             if (userToDelete.Id == userId)
             {
                 throw new ArgumentException("Cannot remove self from chat room");
+            }
+
+            chatRoom.UserList.Remove(user);
+
+            await _chatRoomRepository.UpdateAsync(chatRoom);
+
+            return chatRoom.ToChatRoomDetails();
+        }
+        
+        public async Task<ChatRoomDetails> LeaveChatAsync(Guid userId, Guid chatId)
+        {
+            var chatRoom = await GetGroupChatRoomWithUserValidationAsync(chatId, userId);
+            
+            var user = chatRoom.UserList.FirstOrDefault(u => u.Id == userId);
+
+            if (user is null)
+            {
+                throw new UserNotFoundException(userId);
+            }
+
+            if (chatRoom.UserList.Count == 1)
+            {
+                await _chatRoomRepository.DeleteByIdAsync(chatRoom.Id);
+                return null;
             }
 
             chatRoom.UserList.Remove(user);

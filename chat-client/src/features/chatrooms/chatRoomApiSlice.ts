@@ -1,6 +1,7 @@
 import { apiSlice } from "../../app/api/apiSlice"
 
 import { Message } from "../messages/messagesApiSlice"
+import { getConnection } from "../../app/signalRClient"
 
 interface ChatRoomSummary {
   id: string
@@ -52,51 +53,69 @@ export const chatRoomApiSlice = apiSlice.injectEndpoints({
       query: id => `chatrooms/${id}`,
       providesTags: (result, error, id) => [{ type: "ChatRoom", id }],
     }),
-    createGroupChatRoom: builder.mutation<
-      ChatRoomDetails,
-      GroupChatRoomCreateRequest
-    >({
-      query: body => ({
-        url: "chatrooms/group",
-        method: "POST",
-        body: JSON.stringify(body),
-      }),
+    createGroupChatRoom: builder.mutation<void, GroupChatRoomCreateRequest>({
+      queryFn: async body => {
+        const connection = getConnection()
+
+        if (!connection) {
+          throw new Error("SignalR connection not initialized")
+        }
+
+        await connection.invoke("CreateGroupChatRoom", body)
+
+        return { data: undefined }
+      },
       invalidatesTags: ["ChatRoom"],
     }),
-    updateGroupChatRoom: builder.mutation<
-      ChatRoomDetails,
-      GroupChatRoomUpdateRequest
-    >({
-      query: ({ id, ...body }) => ({
-        url: `chatrooms/${id}`,
-        method: "PUT",
-        body: JSON.stringify(body),
-      }),
+    updateGroupChatRoom: builder.mutation<void, GroupChatRoomUpdateRequest>({
+      queryFn: async body => {
+        const connection = getConnection()
+
+        if (!connection) {
+          throw new Error("SignalR connection not initialized")
+        }
+
+        await connection.invoke("UpdateGroupChatRoom", body.id, body)
+
+        return { data: undefined }
+      },
       invalidatesTags: (result, error, { id }) => [
         { type: "ChatRoom", id },
         { type: "ChatRoom", id: "LIST" },
       ],
     }),
     addUsersToGroupChatRoom: builder.mutation<
-      ChatRoomDetails,
+      void,
       GroupChatRoomAddUsersRequest
     >({
-      query: ({ userIds, ...body }) => ({
-        url: `chatrooms/${body.id}/users`,
-        method: "POST",
-        body: JSON.stringify({ userIds }),
-      }),
+      queryFn: async body => {
+        const connection = getConnection()
+
+        if (!connection) {
+          throw new Error("SignalR connection not initialized")
+        }
+
+        await connection.invoke("AddUsersToGroupChatRoom", body.id, body)
+
+        return { data: undefined }
+      },
       invalidatesTags: (result, error, { id }) => [{ type: "ChatRoom", id }],
     }),
     createDirectChatRoom: builder.mutation<
       ChatRoomDetails,
       DirectChatRoomCreateRequest
     >({
-      query: body => ({
-        url: "chatrooms/direct",
-        method: "POST",
-        body: JSON.stringify(body),
-      }),
+      queryFn: async body => {
+        const connection = getConnection()
+
+        if (!connection) {
+          throw new Error("SignalR connection not initialized")
+        }
+
+        const chatRoom = await connection.invoke("CreateDirectChatRoom", body)
+
+        return { data: chatRoom }
+      },
       invalidatesTags: ["ChatRoom"],
     }),
   }),

@@ -12,7 +12,7 @@ import { RootState, AppDispatch } from "../store" // Assuming you have these typ
 const apiUrl = import.meta.env.VITE_SERVER_URL as string
 
 const baseQuery = fetchBaseQuery({
-  baseUrl: apiUrl + "/api",
+  baseUrl: apiUrl + "api",
   credentials: "include",
   prepareHeaders: (headers, { getState }) => {
     headers.set("content-type", "application/json")

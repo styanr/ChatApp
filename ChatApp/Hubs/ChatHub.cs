@@ -1,4 +1,5 @@
 ﻿using ChatApp.Exceptions;
+using ChatApp.Helpers;
 using ChatApp.Models.Messages;
 using ChatApp.Services.ChatRooms;
 using ChatApp.Services.Messages;
@@ -14,7 +15,8 @@ public class ChatHub : Hub
 {
     private readonly IChatRoomService _chatRoomService;
     private readonly IMessageService _messageService;
-
+    
+    private static readonly ConnectionMapping<Guid> Connections = new();
     public ChatHub(IChatRoomService chatRoomService, IMessageService messageService)
     {
         _chatRoomService = chatRoomService;
@@ -23,8 +25,9 @@ public class ChatHub : Hub
     
     public override async Task OnConnectedAsync()
     {
-        Console.WriteLine("Connected");
         var userId = GetUserId();
+        
+        Connections.Add(userId, Context.ConnectionId);
         
         var chatRooms = await _chatRoomService.GetAllAsync(userId);
         
@@ -34,6 +37,15 @@ public class ChatHub : Hub
         }
         
         await base.OnConnectedAsync();
+    }
+    
+    public override async Task OnDisconnectedAsync(Exception? exception)
+    {
+        var userId = GetUserId();
+        
+        Connections.Remove(userId, Context.ConnectionId);
+        
+        await base.OnDisconnectedAsync(exception);
     }
     
     public async Task JoinChat(Guid chatId)
@@ -47,6 +59,78 @@ public class ChatHub : Hub
         }
 
         await Groups.AddToGroupAsync(Context.ConnectionId, chatId.ToString());
+    }
+    
+    public async Task CreateDirectChatRoom(Guid otherUserId)
+    {
+        var userId = GetUserId();
+        
+        var chatRoom = await _chatRoomService.CreateDirectChatAsync(userId, otherUserId);
+        
+        var otherUserConnectionIds = Connections.GetConnections(otherUserId);
+        
+        await Groups.AddToGroupAsync(Context.ConnectionId, chatRoom.Id.ToString());
+        await Clients.Caller.SendAsync("ReceiveChatRoom", chatRoom);
+        
+        foreach (var connectionId in otherUserConnectionIds)
+        {
+            await Groups.AddToGroupAsync(connectionId, chatRoom.Id.ToString());
+            await Clients.Client(connectionId).SendAsync("ReceiveChatRoom", chatRoom);
+        }
+    }
+    
+    public async Task CreateGroupChatRoom(GroupChatRoomCreate groupChatRoomCreate)
+    {
+        var userId = GetUserId();
+        
+        var chatRoom = await _chatRoomService.CreateGroupChatAsync(userId, groupChatRoomCreate);
+        await Groups.AddToGroupAsync(Context.ConnectionId, chatRoom.Id.ToString());
+        await Clients.Caller.SendAsync("ReceiveChatRoom", chatRoom);
+    }
+    
+    public async Task UpdateGroupChatRoom(Guid chatId, ChatRoomUpdate chatRoomUpdate)
+    {
+        var userId = GetUserId();
+        
+        var chatRoom = await _chatRoomService.UpdateGroupChatAsync(userId, chatId, chatRoomUpdate);
+        
+        var otherUserConnectionIds = Connections.GetConnections(chatRoom.UserIds);
+        
+        foreach (var connectionId in otherUserConnectionIds)
+        {
+            await Clients.Client(connectionId).SendAsync("ReceiveChatRoom", chatRoom);
+        }
+    }
+    
+    public async Task AddUsersToGroupChatRoom(Guid chatId, ChatRoomAddUsers chatRoomAddUsers)
+    {
+        var userId = GetUserId();
+        
+        var chatRoom = await _chatRoomService.AddUsersToChatAsync(userId, chatId, chatRoomAddUsers);
+
+        List<string> otherUserConnectionIds = [];
+        
+        foreach (var addUserId in chatRoomAddUsers.UserIds)
+        {
+            otherUserConnectionIds.AddRange(Connections.GetConnections(addUserId)); 
+        }
+        
+        foreach (var connectionId in otherUserConnectionIds)
+        {
+            await Groups.AddToGroupAsync(connectionId, chatRoom.Id.ToString());
+            await Clients.Client(connectionId).SendAsync("ReceiveChatRoom", chatRoom);
+        }
+    }
+    
+    public async Task LeaveChatRoom(Guid chatId)
+    {
+        var userId = GetUserId();
+        
+        var chatRoom = await _chatRoomService.LeaveChatAsync(userId, chatId);
+        
+        await Groups.RemoveFromGroupAsync(Context.ConnectionId, chatId.ToString());
+        
+        await Clients.Caller.SendAsync("ReceiveChatRoom", chatRoom);
     }
     
     public async Task SendMessage(Guid chatId, MessageCreate message)
