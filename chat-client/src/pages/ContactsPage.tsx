@@ -158,13 +158,16 @@ const ContactsPage: FC<ContactsPageProps> = ({}) => {
                     <div className="relative">
                       <ProfileImage id={user.profilePictureId} size={12} />
                     </div>
-                    <div className="flex-1 ml-5">
-                      <h2 className="font-semibold text-gray-100">
-                        {user.displayName}
-                      </h2>
-                      {user.isContact && (
-                        <p className="text-gray-400 text-sm">Contact</p>
-                      )}
+                    <div className="flex gap-3">
+                      <div className="flex-1 ml-5">
+                        <h2 className="font-semibold text-gray-100">
+                          {user.displayName}
+                        </h2>
+                        {user.isContact && (
+                          <p className="text-gray-400 text-sm">Contact</p>
+                        )}
+                      </div>
+                      <div className="text-gray-400">({user.handle})</div>
                     </div>
                   </Link>
                 </li>

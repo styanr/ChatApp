@@ -27,6 +27,9 @@ public class ChatDbContext : DbContext
         modelBuilder.Entity<User>()
             .HasIndex(x => x.Email).IsUnique();
         
+        modelBuilder.Entity<User>()
+            .HasIndex(x => x.Handle).IsUnique();
+        
         modelBuilder.Entity<ChatRoom>()
             .HasKey(x => x.Id);
         
