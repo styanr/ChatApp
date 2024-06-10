@@ -1,5 +1,5 @@
 import AuthPage from "./pages/AuthPage"
-import { Routes, Route } from "react-router-dom"
+import { Routes, Route, Navigate } from "react-router-dom"
 import Welcome from "./pages/Welcome"
 import RequireAuth from "./components/RequireAuth"
 
@@ -17,6 +17,9 @@ const App = () => {
   return (
     <Routes>
       <Route path="/" element={<Layout />}>
+        {/* Redirect root path to messages */}
+        <Route index element={<Navigate to="/messages" replace />} />
+
         {/* public routes */}
         <Route path="login" element={<AuthPage />} />
         <Route path="register" element={<RegisterPage />} />
