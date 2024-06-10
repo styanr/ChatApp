@@ -243,7 +243,7 @@ const MessagesPage: FC<MessagesPageProps> = ({}) => {
                             <span className="text-lg font-semibold">
                               {chatRoom.name}
                             </span>
-                            <span className="text-sm">
+                            <span className="text-sm text-ellipsis overflow-hidden  line-clamp-1">
                               {chatRoom.lastMessage ? (
                                 chatRoom.lastMessage.isDeleted ? (
                                   <i>Deleted message</i>

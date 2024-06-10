@@ -48,21 +48,21 @@ const Attachment: FC<AttachmentProps> = ({ attachmentId }) => {
           <img
             src={file.url}
             alt="Attachment"
-            className="h-auto rounded-md shadow-md cursor-pointer md:max-h-96 md:max-w-96 object-cover max-h-48 max-w-48"
+            className="h-auto rounded-md shadow-md cursor-pointer w-full object-cover max-h-96"
             onClick={toggleFullScreen}
           />
         )}
         {file.type.startsWith("video/") && (
           <video
             controls
-            className="h-auto rounded-md shadow-md cursor-pointer md:max-h-96 md:max-w-96 max-h-48 max-w-48"
+            className="h-auto rounded-md shadow-md cursor-pointer w-full"
           >
             <source src={file.url} type={file.type} />
             Your browser does not support the video tag.
           </video>
         )}
         {file.type.startsWith("audio/") && (
-          <audio controls={true} className="rounded-md shadow-md">
+          <audio controls={true} className="rounded-md shadow-md w-full">
             <source src={file.url} type={file.type} />
             Your browser does not support the audio tag.
           </audio>
@@ -162,8 +162,8 @@ const Message: FC<MessageProps> = ({
         <div>
           <div
             className={`flex flex-col ${
-              isCurrentUser ? "items-end" : "items-start"
-            } rounded-2xl w-fit ${
+              isCurrentUser ? "items-start" : "items-end"
+            } rounded-2xl w-fit max-w-80 md:max-w-2xl ${
               isNoContent
                 ? ""
                 : isCurrentUser
@@ -232,15 +232,11 @@ const Message: FC<MessageProps> = ({
                     </>
                   )}
                 </div>
-                {message.editedAt ? (
-                  <div className="text-xs">
-                    edited {convertUTCtoLocal(message.editedAt)}
-                  </div>
-                ) : (
-                  <div className="text-xs">
-                    {convertUTCtoLocal(message.createdAt)}
-                  </div>
-                )}
+                <div className={`text-xs`}>
+                  {message.editedAt
+                    ? `edited ${convertUTCtoLocal(message.editedAt)}`
+                    : convertUTCtoLocal(message.createdAt)}
+                </div>
               </>
             )}
           </div>

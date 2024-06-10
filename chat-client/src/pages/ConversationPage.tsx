@@ -110,7 +110,7 @@ const ConversationPage: FC<ConversationPageProps> = () => {
   }, [id])
 
   const handleSendMessage = async () => {
-    if (messageContent.trim() || attachmentId) {
+    if (!isUploading && (messageContent.trim() || attachmentId)) {
       await sendMessage({
         chatRoomId: id as string,
         content: messageContent,
@@ -273,9 +273,13 @@ const ConversationPage: FC<ConversationPageProps> = () => {
         <div className="flex p-4 gap-2 bg-ca-gray z-10">
           <div className="relative flex items-center">
             <span className="mr-2">{attachment.name}</span>
-            <button onClick={handleRemoveAttachment} className="text-red-500">
-              &times;
-            </button>
+            {isUploading ? (
+              <span className="text-green-500">Uploading...</span>
+            ) : (
+              <button onClick={handleRemoveAttachment} className="text-red-500">
+                &times;
+              </button>
+            )}
           </div>
         </div>
       )}
